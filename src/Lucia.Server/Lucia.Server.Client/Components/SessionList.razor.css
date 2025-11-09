@@ -1,4 +1,10 @@
-﻿table {
+﻿/* デスクトップ用テーブルスタイル */
+.table-container {
+    display: block;
+    width: 100%;
+}
+
+table {
     width: 100%;
     border-collapse: collapse;
     background-color: white;
@@ -67,4 +73,148 @@ button {
     color: #666;
     font-size: 14px;
     margin-bottom: 10px;
+}
+
+/* モバイル用カード形式スタイル */
+.card-list {
+    display: none;
+    gap: 12px;
+}
+
+.session-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.card-header {
+    background-color: #f5f5f5;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.card-body {
+    padding: 12px;
+}
+
+.card-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+    .card-row:last-child {
+        border-bottom: none;
+    }
+
+.card-label {
+    font-weight: 600;
+    color: #555;
+}
+
+.card-value {
+    color: #333;
+    word-break: break-all;
+    text-align: right;
+    flex: 1;
+    margin-left: 8px;
+}
+
+.card-footer {
+    padding: 12px;
+    text-align: right;
+    border-top: 1px solid #eee;
+}
+
+    .card-footer button {
+        width: 100%;
+    }
+
+/* メディアクエリ: タブレット以下でカード形式に切り替え */
+@media (max-width: 768px) {
+    .table-container {
+        display: none;
+    }
+
+    .card-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .session-card {
+        margin-bottom: 12px;
+    }
+
+    button {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .card-title {
+        width: 100%;
+    }
+
+    .card-row {
+        flex-direction: column;
+        padding: 10px 0;
+    }
+
+    .card-label {
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .card-value {
+        text-align: left;
+        margin-left: 0;
+    }
+}
+
+/* 超小画面 (スマートフォン) */
+@media (max-width: 480px) {
+    .card-header {
+        padding: 10px;
+    }
+
+    .card-body {
+        padding: 10px;
+    }
+
+    .card-row {
+        padding: 8px 0;
+        font-size: 13px;
+    }
+
+    .card-footer {
+        padding: 10px;
+    }
+
+        .card-footer button {
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+
+    .last-update {
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
 }

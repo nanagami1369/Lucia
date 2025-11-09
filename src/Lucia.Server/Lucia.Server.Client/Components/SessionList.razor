@@ -6,39 +6,73 @@
 
 <div class="last-update">最終更新: @lastUpdate.ToString("HH:mm:ss")</div>
 
-<table>
-    <thead>
-        <tr>
-            <th>セッションID</th>
-            <th>ユーザー名</th>
-            <th>セッション名</th>
-            <th>状態</th>
-            <th>ログイン時刻</th>
-            <th>アイドル時間</th>
-            <th>操作</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var session in sessions)
-        {
+<div class="table-container">
+    <table>
+        <thead>
             <tr>
-                <td>@session.SessionId</td>
-                <td>@session.UserName</td>
-                <td>@session.SessionName</td>
-                <td><span class="status @GetStatusClass(session.State)">@session.State</span></td>
-                <td>@FormatDateTime(session.LoginTime)</td>
-                <td>@FormatTimeSpan(session.IdleTime)</td>
-                <td>
-                    <button @onclick="() => StopSession(session.SessionId, session.UserName)">切断</button>
-                </td>
+                <th>セッションID</th>
+                <th>ユーザー名</th>
+                <th>セッション名</th>
+                <th>状態</th>
+                <th>ログイン時刻</th>
+                <th>アイドル時間</th>
+                <th>操作</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var session in sessions)
+            {
+                <tr>
+                    <td>@session.SessionId</td>
+                    <td>@session.UserName</td>
+                    <td>@session.SessionName</td>
+                    <td><span class="status @GetStatusClass(session.State)">@session.State</span></td>
+                    <td>@FormatDateTime(session.LoginTime)</td>
+                    <td>@FormatTimeSpan(session.IdleTime)</td>
+                    <td>
+                        <button @onclick="() => StopSession(session.SessionId, session.UserName)">切断</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="card-list">
+    @foreach (var session in sessions)
+    {
+        <div class="session-card">
+            <div class="card-header">
+                <div class="card-title">@session.UserName</div>
+                <span class="status @GetStatusClass(session.State)">@session.State</span>
+            </div>
+            <div class="card-body">
+                <div class="card-row">
+                    <span class="card-label">セッションID：</span>
+                    <span class="card-value">@session.SessionId</span>
+                </div>
+                <div class="card-row">
+                    <span class="card-label">セッション名：</span>
+                    <span class="card-value">@session.SessionName</span>
+                </div>
+                <div class="card-row">
+                    <span class="card-label">ログイン時刻：</span>
+                    <span class="card-value">@FormatDateTime(session.LoginTime)</span>
+                </div>
+                <div class="card-row">
+                    <span class="card-label">アイドル時間：</span>
+                    <span class="card-value">@FormatTimeSpan(session.IdleTime)</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button @onclick="() => StopSession(session.SessionId, session.UserName)">切断</button>
+            </div>
+        </div>
+    }
+</div>
 
 @code {
-    private List<SessionInfo>
-    sessions = new();
+    private List<SessionInfo> sessions = new();
     private DateTime lastUpdate = DateTime.Now;
     private HubConnection? hubConnection;
 
@@ -49,9 +83,9 @@
     protected override async Task OnInitializedAsync()
     {
         hubConnection = new HubConnectionBuilder()
-        .WithUrl(NavigationManager.ToAbsoluteUri("/sessionhub"))
-        .WithAutomaticReconnect()
-        .Build();
+            .WithUrl(NavigationManager.ToAbsoluteUri("/sessionhub"))
+            .WithAutomaticReconnect()
+            .Build();
 
         hubConnection.On("SessionsUpdated", async () =>
         {
