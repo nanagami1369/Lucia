@@ -18,11 +18,6 @@ public class Program {
             .AddInteractiveServerComponents()
             .AddInteractiveWebAssemblyComponents();
 
-        var sourceName = typeof(Program).Assembly.GetName().Name;
-        builder.Logging.AddEventLog(config => {
-            config.SourceName = sourceName;
-        });
-
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
