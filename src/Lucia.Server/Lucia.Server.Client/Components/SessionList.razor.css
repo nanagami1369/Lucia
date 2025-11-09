@@ -192,29 +192,41 @@ button {
 /* 超小画面 (スマートフォン) */
 @media (max-width: 480px) {
     .card-header {
-        padding: 10px;
+        padding: 12px;
+    }
+
+    .card-title {
+        font-size: 18px;
     }
 
     .card-body {
-        padding: 10px;
+        padding: 12px;
     }
 
     .card-row {
-        padding: 8px 0;
-        font-size: 13px;
+        padding: 10px 0;
+        font-size: 15px;
+    }
+
+    .card-label {
+        font-size: 15px;
+    }
+
+    .card-value {
+        font-size: 15px;
     }
 
     .card-footer {
-        padding: 10px;
+        padding: 12px;
     }
 
         .card-footer button {
-            padding: 8px 10px;
-            font-size: 13px;
+            padding: 10px 12px;
+            font-size: 15px;
         }
 
     .last-update {
-        font-size: 12px;
-        margin-bottom: 8px;
+        font-size: 13px;
+        margin-bottom: 10px;
     }
 }
