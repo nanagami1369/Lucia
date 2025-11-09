@@ -15,7 +15,7 @@ if "%~1"=="" (
 if /i "%~1"=="install" (
     echo サービスを登録中...
     sc.exe create "%ServiceName%" binPath= "\"%ExePath%\" --urls http://0.0.0.0:%Port%" start= auto >nul
-    netsh advfirewall firewall add rule name="%ServiceName%" dir=in action=allow protocol=TCP localport=%Port% remoteip=192.168.0.0/16 >nul
+    netsh advfirewall firewall add rule name="%ServiceName%" dir=in action=allow program="%ExePath%" protocol=TCP localport=%Port% remoteip=192.168.0.0/16 profile=private >nul
     echo サービス '%ServiceName%' を登録し、ポート %Port% を開放しました。
     exit /b 0
 )
