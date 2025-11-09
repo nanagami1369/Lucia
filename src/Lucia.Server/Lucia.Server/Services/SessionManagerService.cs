@@ -44,7 +44,7 @@ public class SessionManagerService {
                 ));
             }
 
-            _logger.LogInformation("セッション情報の取得成功: {Count}件", sessions.Count);
+            _logger.LogDebug("セッション情報の取得成功: {Count}件", sessions.Count);
         } catch (Exception ex) {
             _logger.LogError(ex, "セッション情報の取得中にエラーが発生しました");
         }
