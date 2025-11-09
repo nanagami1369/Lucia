@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucia.Server", "src\Lucia.S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucia.Server.Client", "src\Lucia.Server\Lucia.Server.Client\Lucia.Server.Client.csproj", "{881B7E64-D731-4ADB-A292-4FF9831EB298}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucia.Models", "src\Lucia.Models\Lucia.Models.csproj", "{4226FC2F-C844-4D02-A6CE-1E4AAD4E196C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{881B7E64-D731-4ADB-A292-4FF9831EB298}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{881B7E64-D731-4ADB-A292-4FF9831EB298}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{881B7E64-D731-4ADB-A292-4FF9831EB298}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4226FC2F-C844-4D02-A6CE-1E4AAD4E196C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4226FC2F-C844-4D02-A6CE-1E4AAD4E196C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4226FC2F-C844-4D02-A6CE-1E4AAD4E196C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4226FC2F-C844-4D02-A6CE-1E4AAD4E196C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

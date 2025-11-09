@@ -1,10 +1,17 @@
 using Lucia.Server.Components;
+using Lucia.Server.Services;
+
+using SessionMonitor.Hubs;
 
 namespace Lucia.Server;
 
 public class Program {
     public static void Main(string[] args) {
         var builder = WebApplication.CreateBuilder(args);
+
+        builder.Host.UseWindowsService();
+
+        builder.Services.AddSingleton<SessionManagerService>();
 
         // Add services to the container.
         builder.Services.AddRazorComponents()
@@ -32,6 +39,8 @@ public class Program {
             .AddInteractiveServerRenderMode()
             .AddInteractiveWebAssemblyRenderMode()
             .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
+
+        app.MapHub<SessionHub>("/sessionhub");
 
         app.Run();
     }

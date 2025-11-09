@@ -1,0 +1,180 @@
+﻿@using Lucia.Models.Models
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<div class="last-update">最終更新: @lastUpdate.ToString("HH:mm:ss")</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>セッションID</th>
+            <th>ユーザー名</th>
+            <th>セッション名</th>
+            <th>状態</th>
+            <th>ログイン時刻</th>
+            <th>アイドル時間</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var session in sessions)
+        {
+            <tr>
+                <td>@session.SessionId</td>
+                <td>@session.UserName</td>
+                <td>@session.SessionName</td>
+                <td><span class="status @GetStatusClass(session.State)">@session.State</span></td>
+                <td>@FormatDateTime(session.LoginTime)</td>
+                <td>@FormatTimeSpan(session.IdleTime)</td>
+                <td>
+                    <button @onclick="() => StopSession(session.SessionId, session.UserName)">切断</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<SessionInfo>
+    sessions = new();
+    private DateTime lastUpdate = DateTime.Now;
+    private HubConnection? hubConnection;
+
+    /// <summary>
+    /// コンポーネント初期化時の処理
+    /// SignalR接続を確立し、セッション情報を読み込みます
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+        .WithUrl(NavigationManager.ToAbsoluteUri("/sessionhub"))
+        .WithAutomaticReconnect()
+        .Build();
+
+        hubConnection.On("SessionsUpdated", async () =>
+        {
+            await LoadSessions();
+            await InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+        await LoadSessions();
+
+        // 5秒ごとに自動更新
+        _ = Task.Run(async () =>
+        {
+            while (hubConnection.State == HubConnectionState.Connected)
+            {
+                await Task.Delay(5000);
+                await LoadSessions();
+                await InvokeAsync(StateHasChanged);
+            }
+        });
+    }
+
+    /// <summary>
+    /// SignalR経由でセッション一覧を読み込みます
+    /// </summary>
+    private async Task LoadSessions()
+    {
+        if (hubConnection is not null)
+        {
+            sessions = await hubConnection.InvokeAsync<List<SessionInfo>>("GetSessions");
+            lastUpdate = DateTime.Now;
+        }
+    }
+
+    /// <summary>
+    /// 指定されたセッションを切断します
+    /// </summary>
+    /// <param name="sessionId">切断対象のセッションID</param>
+    /// <param name="userName">確認ダイアログに表示するユーザー名</param>
+    private async Task StopSession(int sessionId, string userName)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"本当にセッション {sessionId} ({userName}) を切断しますか？");
+        if (!confirmed)
+        {
+            return;
+        }
+
+        if (hubConnection is not null)
+        {
+            var success = await hubConnection.InvokeAsync<bool>("StopSession", sessionId);
+            if (success)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "セッションを切断しました");
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "セッションの切断に失敗しました");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 日時を表示用フォーマットに変換します
+    /// </summary>
+    /// <param name="dateTime">変換対象の日時</param>
+    /// <returns>フォーマット済み文字列</returns>
+    private string FormatDateTime(DateTime? dateTime)
+    {
+        if (!dateTime.HasValue)
+        {
+            return "N/A";
+        }
+        return dateTime.Value.ToString("yyyy/MM/dd HH:mm:ss");
+    }
+
+    /// <summary>
+    /// 時間間隔を日本語表記に変換します
+    /// </summary>
+    /// <param name="timeSpan">変換対象の時間間隔</param>
+    /// <returns>日本語フォーマット済み文字列</returns>
+    private string FormatTimeSpan(TimeSpan? timeSpan)
+    {
+        if (!timeSpan.HasValue)
+        {
+            return "N/A";
+        }
+
+        var ts = timeSpan.Value;
+        if (ts.Days > 0)
+        {
+            return $"{ts.Days}日 {ts.Hours}時間 {ts.Minutes}分";
+        }
+        if (ts.Hours > 0)
+        {
+            return $"{ts.Hours}時間 {ts.Minutes}分";
+        }
+        return $"{ts.Minutes}分";
+    }
+
+    /// <summary>
+    /// セッション状態に応じたCSSクラス名を取得します
+    /// </summary>
+    /// <param name="state">セッション状態</param>
+    /// <returns>CSSクラス名</returns>
+    private string GetStatusClass(string state)
+    {
+        return state.ToUpper() switch
+        {
+            "ACTIVE" => "status-active",
+            "DISCONNECTED" => "status-disconnected",
+            _ => "status-idle"
+        };
+    }
+
+    /// <summary>
+    /// コンポーネント破棄時の処理
+    /// SignalR接続をクリーンアップします
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}
