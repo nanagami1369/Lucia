@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Installer.bat">
+      <None Update="Installer.ps1">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
