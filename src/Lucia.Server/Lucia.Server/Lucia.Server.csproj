@@ -16,4 +16,10 @@
         <PackageReference Include="Microsoft.Extensions.Logging.EventLog" Version="9.0.10" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Installer.bat">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
