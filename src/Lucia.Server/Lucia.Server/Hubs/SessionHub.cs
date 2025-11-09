@@ -9,14 +9,38 @@ namespace SessionMonitor.Hubs;
 /// セッション情報をリアルタイム配信するSignalRハブ
 /// </summary>
 public class SessionHub : Hub {
-    private readonly SessionManagerService _sessionManagerService;
+    private readonly SessionManagerService _sessionManager;
+    private readonly ILogger<SessionHub> _logger;
 
     /// <summary>
     /// SessionHubの新しいインスタンスを初期化します
     /// </summary>
     /// <param name="sessionManager">セッション管理サービス</param>
-    public SessionHub(SessionManagerService sessionManager) {
-        _sessionManagerService = sessionManager;
+    /// <param name="logger">ロガー</param>
+    public SessionHub(SessionManagerService sessionManager, ILogger<SessionHub> logger) {
+        _sessionManager = sessionManager;
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// クライアント接続時の処理
+    /// </summary>
+    public override async Task OnConnectedAsync() {
+        _logger.LogInformation("クライアント接続: ConnectionId={ConnectionId}", Context.ConnectionId);
+        await base.OnConnectedAsync();
+    }
+
+    /// <summary>
+    /// クライアント切断時の処理
+    /// </summary>
+    /// <param name="exception">例外情報（正常切断時はnull）</param>
+    public override async Task OnDisconnectedAsync(Exception? exception) {
+        if (exception != null) {
+            _logger.LogWarning(exception, "クライアント切断（異常終了）: ConnectionId={ConnectionId}", Context.ConnectionId);
+        } else {
+            _logger.LogInformation("クライアント切断: ConnectionId={ConnectionId}", Context.ConnectionId);
+        }
+        await base.OnDisconnectedAsync(exception);
     }
 
     /// <summary>
@@ -24,7 +48,8 @@ public class SessionHub : Hub {
     /// </summary>
     /// <returns>セッション情報のリスト</returns>
     public List<SessionInfo> GetSessions() {
-        return _sessionManagerService.GetActiveSessions();
+        _logger.LogDebug("GetSessions呼び出し: ConnectionId={ConnectionId}", Context.ConnectionId);
+        return _sessionManager.GetActiveSessions();
     }
 
     /// <summary>
@@ -33,9 +58,12 @@ public class SessionHub : Hub {
     /// <param name="sessionId">切断対象のセッションID</param>
     /// <returns>成功した場合true、失敗した場合false</returns>
     public async Task<bool> StopSession(int sessionId) {
-        var success = _sessionManagerService.StopSession(sessionId);
+        _logger.LogInformation("StopSession呼び出し: SessionId={SessionId}, ConnectionId={ConnectionId}", sessionId, Context.ConnectionId);
+
+        var success = _sessionManager.StopSession(sessionId);
 
         if (success) {
+            _logger.LogInformation("セッション切断成功、全クライアントに通知: SessionId={SessionId}", sessionId);
             // 全クライアントにセッション更新を通知
             await Clients.All.SendAsync("SessionsUpdated");
         }

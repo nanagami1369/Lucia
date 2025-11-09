@@ -9,12 +9,15 @@ namespace Lucia.Server.Services;
 /// </summary>
 public class SessionManagerService {
     private readonly ITerminalServicesManager _manager;
+    private readonly ILogger<SessionManagerService> _logger;
 
     /// <summary>
     /// SessionManagerの新しいインスタンスを初期化します
     /// </summary>
-    public SessionManagerService() {
+    /// <param name="logger">ロガー</param>
+    public SessionManagerService(ILogger<SessionManagerService> logger) {
         _manager = new TerminalServicesManager();
+        _logger = logger;
     }
 
     /// <summary>
@@ -25,6 +28,8 @@ public class SessionManagerService {
         var sessions = new List<SessionInfo>();
 
         try {
+            _logger.LogDebug("セッション情報の取得を開始");
+
             using var server = _manager.GetLocalServer();
             server.Open();
 
@@ -38,8 +43,10 @@ public class SessionManagerService {
                     IdleTime: session.IdleTime
                 ));
             }
+
+            _logger.LogInformation("セッション情報の取得成功: {Count}件", sessions.Count);
         } catch (Exception ex) {
-            Console.WriteLine($"Error getting sessions: {ex.Message}");
+            _logger.LogError(ex, "セッション情報の取得中にエラーが発生しました");
         }
 
         return sessions;
@@ -52,14 +59,18 @@ public class SessionManagerService {
     /// <returns>成功した場合true、失敗した場合false</returns>
     public bool StopSession(int sessionId) {
         try {
+            _logger.LogInformation("セッション切断を開始: SessionId={SessionId}", sessionId);
+
             using var server = _manager.GetLocalServer();
             server.Open();
 
             var session = server.GetSession(sessionId);
             session.Logoff();
+
+            _logger.LogInformation("セッション切断成功: SessionId={SessionId}", sessionId);
             return true;
         } catch (Exception ex) {
-            Console.WriteLine($"Error stopping session {sessionId}: {ex.Message}");
+            _logger.LogError(ex, "セッション切断中にエラーが発生しました: SessionId={SessionId}", sessionId);
             return false;
         }
     }
