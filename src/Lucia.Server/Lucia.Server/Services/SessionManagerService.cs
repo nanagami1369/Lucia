@@ -34,9 +34,16 @@ public class SessionManagerService {
             server.Open();
 
             foreach (var session in server.GetSessions()) {
+
+                var userAccount = session.UserAccount;
+
+                if (userAccount == null) {
+                    continue;
+                }
+
                 sessions.Add(new SessionInfo(
                     SessionId: session.SessionId,
-                    UserName: session.UserAccount?.ToString() ?? "N/A",
+                    UserName: userAccount.ToString(),
                     SessionName: session.WindowStationName,
                     State: session.ConnectionState.ToString(),
                     LoginTime: session.LoginTime,
@@ -65,6 +72,9 @@ public class SessionManagerService {
             server.Open();
 
             var session = server.GetSession(sessionId);
+            if (session.UserAccount == null) {
+                throw new Exception($"そのセッションは削除できません SessionId={sessionId}");
+            }
             session.Logoff();
 
             _logger.LogInformation("セッション切断成功: SessionId={SessionId}", sessionId);
