@@ -1,7 +1,8 @@
+using Lucia.Server.BackgroundServices;
 using Lucia.Server.Components;
-using Lucia.Server.Services;
-
-using SessionMonitor.Hubs;
+using Lucia.Server.Hubs;
+using Lucia.Services;
+using Lucia.Services.Sessions;
 
 namespace Lucia.Server;
 
@@ -11,9 +12,15 @@ public class Program {
 
         builder.Host.UseWindowsService();
 
-        builder.Services.AddSingleton<SessionManagerService>();
+        // ロガー追加
+        builder.Services.AddTransient(typeof(StatsLogger<>));
 
-        // Add services to the container.
+        // サービス追加
+        builder.Services.AddSingleton<ISessionService, SessionService>();
+        
+        // バックグラウンドサービス追加
+        builder.Services.AddHostedService<SessionFetchWorker>();
+
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents()
             .AddInteractiveWebAssemblyComponents();

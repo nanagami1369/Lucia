@@ -8,11 +8,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Lucia.Models\Lucia.Models.csproj" />
-        <ProjectReference Include="..\Lucia.Server.Client\Lucia.Server.Client.csproj" />
-        <PackageReference Include="Cassia" Version="2.0.0.60" />
+        <PackageReference Include="System.ServiceProcess.ServiceController" Version="10.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.0-rc.2.25502.107" />
         <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="9.0.10" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Lucia.Models\Lucia.Models.csproj" />
+      <ProjectReference Include="..\..\Lucia.Services\Lucia.Services.csproj" />
+      <ProjectReference Include="..\Lucia.Server.Client\Lucia.Server.Client.csproj" />
     </ItemGroup>
 
     <ItemGroup>
