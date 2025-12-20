@@ -1,3 +1,35 @@
+.base-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-sm); /* モバイル: 8px */
+}
+
+@media (min-width: 481px) {
+    .base-container {
+        padding: var(--spacing-md); /* タブレット: 12px */
+    }
+}
+
+@media (min-width: 1024px) {
+    .base-container {
+        padding: var(--spacing-lg); /* デスクトップ: 16px */
+    }
+}
+
+.header {
+    background: var(--color-surface);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius);
+    border-bottom: 2px solid var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+    .header h1 {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-text-primary);
+    }
+
 #blazor-error-ui {
     color-scheme: light only;
     background: lightyellow;

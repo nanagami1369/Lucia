@@ -1,3 +1,88 @@
+/* カラートークン */
+:root {
+    /* 機能色 */
+    --color-primary: #2196F3;
+    --color-primary-hover: #1976D2;
+    --color-warning: #FF9800;
+    --color-warning-hover: #F57C00;
+    --color-danger: #F44336;
+    --color-danger-hover: #D32F2F;
+    --color-success: #4CAF50;
+    --color-info: #03A9F4;
+    /* 中性色 */
+    --color-background: #F8F9FA;
+    --color-surface: #FFFFFF;
+    --color-border: #E0E0E0;
+    /* テキスト */
+    --color-text-primary: #212121;
+    --color-text-secondary: #757575;
+    --color-text-disabled: #BDBDBD;
+}
+
+/* 空白トークン */
+:root {
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+}
+
+/* サイズトークン */
+:root {
+    /* タッチターゲット */
+    --touch-target-min: 44px;
+    --touch-target-comfortable: 48px;
+    --compact-control: 32px;
+    /* コンポーネント高さ */
+    --height-button: var(--touch-target-min);
+    --height-input: var(--touch-target-min);
+    --height-compact-button: var(--compact-control);
+}
+
+/* 文字トークン */
+:root {
+    --font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+    --font-size-xs: 11px;
+    --font-size-sm: 12px;
+    --font-size-base: 13px;
+    --font-size-md: 14px;
+    --font-size-lg: 16px;
+    --font-size-xl: 18px;
+    --font-size-2xl: 20px;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --line-height: 1.5;
+}
+
+/* デザイントークン */
+:root {
+    --radius: 6px;
+    --radius-badge: 10px;
+    --transition-speed: 200ms;
+    --transition-easing: ease;
+    --z-index-dropdown: 1000;
+    --z-index-modal: 2000;
+    --z-index-toast: 3000;
+}
+
+*,
+*::before,
+*::after {
+    margin: 0px;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    line-height: var(--line-height);
+    padding: var(--spacing-sm);
+}
+
+/* 以下はBlazor 標準 */
+
 h1:focus {
     outline: none;
 }
@@ -28,11 +113,13 @@ h1:focus {
     border-color: #929292;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder {
     color: var(--bs-secondary-color);
     text-align: end;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
