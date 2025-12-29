@@ -1,71 +1,91 @@
-/* カラートークン */
 :root {
-    /* 機能色 */
-    --color-primary: #2196F3;
-    --color-primary-hover: #1976D2;
-    --color-warning: #FF9800;
-    --color-warning-hover: #F57C00;
-    --color-danger: #F44336;
-    --color-danger-hover: #D32F2F;
-    --color-success: #4CAF50;
-    --color-info: #03A9F4;
-    /* 中性色 */
-    --color-background: #F8F9FA;
-    --color-surface: #FFFFFF;
-    --color-border: #E0E0E0;
-    /* テキスト */
+    /* ===== 色トークン ===== */
+    /* 背景色 */
+    --color-bg-primary: #FFFFFF;
+    --color-bg-secondary: #F8F9FA;
+    --color-bg-tertiary: #F3F4F6;
+    /* テキスト色 */
     --color-text-primary: #212121;
     --color-text-secondary: #757575;
-    --color-text-disabled: #BDBDBD;
-}
-
-/* 空白トークン */
-:root {
-    --spacing-xs: 4px;
-    --spacing-sm: 8px;
-    --spacing-md: 12px;
-    --spacing-lg: 16px;
-    --spacing-xl: 24px;
-}
-
-/* サイズトークン */
-:root {
-    /* タッチターゲット */
-    --touch-target-min: 44px;
-    --touch-target-comfortable: 48px;
-    --compact-control: 32px;
-    /* コンポーネント高さ */
-    --height-button: var(--touch-target-min);
-    --height-input: var(--touch-target-min);
-    --height-compact-button: var(--compact-control);
-}
-
-/* 文字トークン */
-:root {
-    --font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
-    --font-size-xs: 11px;
+    --color-text-muted: #BDBDBD;
+    --color-text-inverse: #FFFFFF;
+    /* 枠線色 */
+    --color-border-default: #E0E0E0;
+    --color-border-strong: #D1D5DB;
+    /* インタラクティブ・ステータス色 */
+    --color-accent: #2196F3;
+    --color-accent-hover: #1976D2;
+    --color-success: #4CAF50;
+    --color-success-hover: #3D8C40;
+    --color-warning: #FF9800;
+    --color-warning-hover: #CC7A00;
+    --color-error: #F44336;
+    --color-error-hover: #C3362B;
+    /* ===== 間隔トークン ===== */
+    /* 基本単位: 4px */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+    /* ===== タイポグラフィトークン ===== */
+    /* フォントファミリー */
+    --font-family-base: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    --font-family-mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    /* フォントサイズ (モバイル - 12/13/14/16/18px) */
     --font-size-sm: 12px;
     --font-size-base: 13px;
     --font-size-md: 14px;
     --font-size-lg: 16px;
     --font-size-xl: 18px;
-    --font-size-2xl: 20px;
+    /* フォントウェイト */
     --font-weight-normal: 400;
     --font-weight-medium: 500;
-    --font-weight-semibold: 600;
-    --line-height: 1.5;
+    --font-weight-bold: 700;
+    /* 行高 */
+    --line-height-tight: 1.25;
+    --line-height-base: 1.5;
+    --line-height-relaxed: 1.75;
+    /* ===== ボーダーラジアストークン ===== */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 12px;
+    --radius-full: 9999px;
+    /* ===== その他のトークン ===== */
+    /* zインデックススケール */
+    --z-dropdown: 1000;
+    --z-modal: 2000;
+    --z-toast: 3000;
+    /* トランジション */
+    --transition-duration: 200ms;
+    --transition-timing: ease;
 }
 
-/* デザイントークン */
-:root {
-    --radius: 6px;
-    --radius-badge: 10px;
-    --transition-speed: 200ms;
-    --transition-easing: ease;
-    --z-index-dropdown: 1000;
-    --z-index-modal: 2000;
-    --z-index-toast: 3000;
+/* タブレットブレークポイント (768px) */
+@media (min-width: 768px) {
+    :root {
+        /* フォントサイズ (タブレット - 13/14/16/18/20px) */
+        --font-size-sm: 13px;
+        --font-size-base: 14px;
+        --font-size-md: 16px;
+        --font-size-lg: 18px;
+        --font-size-xl: 20px;
+    }
 }
+
+/* デスクトップブレークポイント (1024px) */
+@media (min-width: 1024px) {
+    :root {
+        /* フォントサイズ (デスクトップ - 14/16/18/20/22px) */
+        --font-size-sm: 14px;
+        --font-size-base: 16px;
+        --font-size-md: 18px;
+        --font-size-lg: 20px;
+        --font-size-xl: 22px;
+    }
+}
+
 
 *,
 *::before,
@@ -74,11 +94,16 @@
 }
 
 body {
-    font-family: var(--font-family);
-    background-color: var(--color-background);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    background-color: var(--color-bg-tertiary);
     color: var(--color-text-primary);
-    line-height: var(--line-height);
-    padding: var(--spacing-sm);
+    line-height: var(--line-height-base);
+    padding: var(--space-3);
+}
+
+section {
+    display: block;
 }
 
 /* 以下はBlazor 標準 */
