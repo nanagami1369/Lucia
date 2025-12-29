@@ -1,0 +1,20 @@
+﻿.content-card {
+    border: solid 1px var(--color-border-default);
+    border-radius: var(--radius-sm);
+}
+
+.card-title {
+    color: var(--color-text-secondary);
+    background-color: var(--color-bg-secondary);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+    padding-inline: var(--space-4);
+    border-radius: var(--radius-sm);
+}
+
+.card-content {
+    background-color: var(--color-bg-primary);
+    padding: var(--space-2);
+    border-bottom-left-radius: var(--radius-sm);
+    border-bottom-right-radius: var(--radius-sm);
+}
