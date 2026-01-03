@@ -10,7 +10,7 @@ namespace Lucia.Server.Client.HubClients;
 /// <summary>
 /// セッションハブクライアント
 /// </summary>
-public class SessionHubClient : HubClient {
+public class SessionHubClient : HubClient, ISessionHub {
 
     /// <summary>
     /// コンストラクター
@@ -39,4 +39,18 @@ public class SessionHubClient : HubClient {
 
     }
 
+    /// <summary>
+    /// ログオフ
+    /// </summary>
+    /// <param name="sessionId">セッションID</param>
+    public Task LogOffSession(int sessionId) {
+        return SendAsync(nameof(ISessionHub.LogOffSession), sessionId);
+    }
+
+    /// <summary>
+    /// RDS再起動
+    /// </summary>
+    public Task RestartRdp() {
+        return SendAsync(nameof(ISessionHub.RestartRdp));
+    }
 }

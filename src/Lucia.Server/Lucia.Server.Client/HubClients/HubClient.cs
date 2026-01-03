@@ -112,6 +112,39 @@ public abstract class HubClient : IAsyncDisposable {
         return _connection.DisposeAsync();
     }
 
+    #region 通信処理系
+
+    /// <summary>
+    /// Hub上のメソッドを呼び出します。
+    /// </summary>
+    /// <param name="methodName">メソッド名称</param>
+    /// <param name="args">引数</param>
+    protected Task SendAsync(string methodName, params object?[] args) {
+        if (_connection.State is not HubConnectionState.Connected) {
+            _logger.LogWarning("クライアントは接続中ではありません");
+            return Task.CompletedTask;
+        }
+        return _connection.SendCoreAsync(methodName, args, CancellationToken.None);
+    }
+
+    /// <summary>
+    /// キャンセルトークン付きでHub上のメソッドを呼び出します。
+    /// </summary>
+    /// <param name="methodName">メソッド名称</param>
+    /// <param name="cancellationToken">キャンセルトークン</param>
+    /// <param name="args">引数</param>
+    protected Task SendAsync(string methodName, CancellationToken cancellationToken, params object?[] args) {
+        if (_connection.State is not HubConnectionState.Connected) {
+            _logger.LogWarning("クライアントは接続中ではありません");
+            return Task.CompletedTask;
+        }
+        return _connection.SendCoreAsync(methodName, args, cancellationToken);
+    }
+
+    #endregion
+
+    #region ユーティリティ系
+
     /// <summary>
     /// イベントを安全に呼び出す。ハンドラ内の例外は呼び出し元に伝播しない。
     /// </summary>
@@ -122,6 +155,8 @@ public abstract class HubClient : IAsyncDisposable {
             _logger.LogError(e, "イベントハンドラ内で例外が発生しました");
         }
     }
+
+    #endregion
 
 }
 
