@@ -14,6 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\LuciaServer.Shared\LuciaServer.Shared.csproj" />
       <ProjectReference Include="..\..\Lucia.Models\Lucia.Models.csproj" />
       <ProjectReference Include="..\..\Lucia.Services\Lucia.Services.csproj" />
       <ProjectReference Include="..\Lucia.Server.Client\Lucia.Server.Client.csproj" />

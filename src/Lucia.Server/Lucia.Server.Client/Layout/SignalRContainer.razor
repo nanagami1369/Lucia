@@ -1,0 +1,17 @@
+﻿@using Lucia.Server.Client.HubClients
+
+@rendermode InteractiveWebAssembly
+@inject IEnumerable<HubClient> HubClients
+
+@code {
+
+    /// <summary>
+    /// ハブの起動
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) { return; }
+        await Task.WhenAll(HubClients.Select(c => c.Start()));
+    }
+
+}

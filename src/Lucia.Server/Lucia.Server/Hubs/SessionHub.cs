@@ -3,6 +3,8 @@
 using Lucia.Models.Exceptions;
 using Lucia.Services.Sessions;
 
+using LuciaServer.Shared;
+
 using Microsoft.AspNetCore.SignalR;
 
 namespace Lucia.Server.Hubs;
@@ -10,7 +12,7 @@ namespace Lucia.Server.Hubs;
 /// <summary>
 /// セッションハブ
 /// </summary>
-public class SessionHub : Hub {
+public class SessionHub : Hub<IClientSessionHub>, ISessionHub {
 
     /// <summary>
     /// セッションサービス

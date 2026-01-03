@@ -1,11 +1,13 @@
-﻿@inherits LayoutComponentBase
+﻿@using Lucia.Server.Client.HubClients
+@inherits LayoutComponentBase
+
 <div class="base-container">
     <header>
         <h1>💡 Lucia</h1>
     </header>
     @Body
 </div>
-
+<SignalRContainer />
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
     <a href="." class="reload">Reload</a>

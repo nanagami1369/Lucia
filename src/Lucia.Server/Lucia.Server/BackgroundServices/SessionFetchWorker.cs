@@ -1,6 +1,8 @@
 ﻿using Lucia.Server.Hubs;
 using Lucia.Services.Sessions;
 
+using LuciaServer.Shared;
+
 using Microsoft.AspNetCore.SignalR;
 
 namespace Lucia.Server.BackgroundServices;
@@ -56,7 +58,7 @@ public class SessionFetchWorker : BackgroundService {
         while (!stoppingToken.IsCancellationRequested) {
             try {
                 var session = await Task.Run(() => sessionService.GetSessions());
-                await sessionHub.Clients.All.SendAsync("GetSessions", session, stoppingToken);
+                await sessionHub.Clients.All.SendAsync(nameof(IClientSessionHub.GetSessions), session, stoppingToken);
                 await Task.Delay(5000, stoppingToken);
 
                 // 成功したらエラー回数をリセット
