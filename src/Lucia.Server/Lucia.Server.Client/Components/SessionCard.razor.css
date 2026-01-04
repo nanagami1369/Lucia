@@ -3,7 +3,6 @@
     flex-direction: column;
     border-radius: var(--radius-md);
     border: solid 1px var(--color-border-default);
-    max-width: 300px;
 }
 
     .session-card.active {

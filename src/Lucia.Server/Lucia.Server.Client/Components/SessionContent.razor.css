@@ -17,3 +17,9 @@
     .restart-rds-button:active {
         background-color: var(--color-warning-hover);
     }
+
+.session-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 450px), 1fr));
+    gap: var(--space-3);
+}
