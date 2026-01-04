@@ -1,0 +1,49 @@
+﻿@using Lucia.Models.Models
+<section class="session-card @SessionStateClass(Session)">
+
+    <header class="card-header">
+        <span class="card-title">@Session.UserName</span>
+        <span class="card-badge">@Session.State</span>
+    </header>
+    <div class="card-item">
+        <span class="item-label">ID</span>
+        <span class="item-value">@Session.SessionId</span>
+    </div>
+    <div class="card-item">
+        <span class="item-label">ログイン</span>
+        <span class="item-value">@Session.LoginTime?.ToString("HH:mm")</span>
+    </div>
+    <div class="card-item">
+        <span class="item-label">アイドル</span>
+        <span class="item-value">@Session.IdleTime?.ToString("hh':'mm")</span>
+    </div>
+    <footer class="card-footer">
+        <button class="logoff-button" @onclick="HandleOnClickSessionLogoffButton">切断</button>
+    </footer>
+</section>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public SessionInfo Session { get; set; } = null!;
+
+    /// <summary>
+    /// セッションログオフ依頼(セッションID)
+    /// </summary>
+    [Parameter]
+    public EventCallback<int> RequestSessionLogoff { get; set; }
+
+    /// <summary>
+    /// 切断ボタンを押下
+    /// </summary>
+    private async Task HandleOnClickSessionLogoffButton()
+    {
+        await RequestSessionLogoff.InvokeAsync();
+    }
+
+    private string? SessionStateClass(SessionInfo sessionInfo)
+    {
+        return sessionInfo.State.ToString().ToLower();
+    }
+
+}

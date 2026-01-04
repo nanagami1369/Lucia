@@ -1,0 +1,92 @@
+﻿@using Lucia.Models.Models
+@using Lucia.Server.Client.HubClients
+@inject IServiceProvider Services
+@implements IDisposable
+@rendermode InteractiveWebAssembly
+<div class="content-description">
+    <span class="last-update">
+        最終更新：@lastUpdated.ToString("HH:mm:ss")
+    </span>
+    <button class="restart-rds-button" @onclick="HandleOnClickRestartRdsButton">RDS再起動</button>
+</div>
+<div class="session-list">
+    @foreach (var session in SessionList)
+    {
+        <SessionCard Session="session" RequestSessionLogoff="HandleRequestSessionLogoff"></SessionCard>
+    }
+</div>
+
+@code {
+
+
+    /// <summary>
+    /// セッション ハブ クライアント
+    /// </summary>
+    private SessionHubClient? SessionHubClient { get; set; }
+
+    /// <summary>
+    /// 最終更新
+    /// </summary>
+    private DateTime lastUpdated = DateTime.Now;
+
+    /// <summary>
+    /// セッションリスト
+    /// </summary>
+    private SessionInfo[] SessionList { get; set; } = [];
+
+    /// <summary>
+    /// レンダリング時
+    /// </summary>
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender) { return; }
+        if (Services.GetService<SessionHubClient>() is { } hubClient)
+        {
+            SessionHubClient = hubClient;
+            SessionHubClient.UpdateSession += UpdateSession;
+        }
+
+    }
+
+    /// <summary>
+    /// 破棄処理
+    /// </summary>
+    public void Dispose()
+    {
+        if (SessionHubClient != null)
+        {
+            SessionHubClient.UpdateSession -= UpdateSession;
+        }
+    }
+
+    /// <summary>
+    /// セッション更新時
+    /// </summary>
+    /// <param name="sessions"></param>
+    private void UpdateSession(SessionInfo[] sessions)
+    {
+        lastUpdated = DateTime.Now;
+        SessionList = sessions;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// RDS再起動ボタン押下時
+    /// </summary>
+    private async Task HandleOnClickRestartRdsButton()
+    {
+        if (SessionHubClient is null) { return; }
+        await SessionHubClient.RestartRdp();
+    }
+
+    /// <summary>
+    /// 切断ボタン押下時
+    /// </summary>
+    /// <param name="sessionId">セッションID</param>
+    private async Task HandleRequestSessionLogoff(int sessionId)
+    {
+        if (SessionHubClient is null) { return; }
+        await SessionHubClient.LogOffSession(sessionId);
+    }
+
+}

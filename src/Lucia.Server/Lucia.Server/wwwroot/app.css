@@ -15,12 +15,16 @@
     /* インタラクティブ・ステータス色 */
     --color-accent: #2196F3;
     --color-accent-hover: #1976D2;
+    --color-accent-light: #E3F2FD;
     --color-success: #4CAF50;
     --color-success-hover: #3D8C40;
+    --color-success-light: #E8F5E9;
     --color-warning: #FF9800;
     --color-warning-hover: #CC7A00;
+    --color-warning-light: #FFF3E0;
     --color-error: #F44336;
     --color-error-hover: #C3362B;
+    --color-error-light: #FFEBEE;
     /* ===== 間隔トークン ===== */
     /* 基本単位: 4px */
     --space-1: 4px;
@@ -52,6 +56,10 @@
     --radius-md: 6px;
     --radius-lg: 12px;
     --radius-full: 9999px;
+    /* ===== Control Height（3個）===== */
+    --control-height-sm: 32px;
+    --control-height-md: 40px;
+    --control-height-lg: 48px;
     /* ===== その他のトークン ===== */
     /* zインデックススケール */
     --z-dropdown: 1000;
@@ -99,11 +107,21 @@ body {
     background-color: var(--color-bg-tertiary);
     color: var(--color-text-primary);
     line-height: var(--line-height-base);
-    padding: var(--space-3);
+    margin: var(--space-3);
+    width: calc(100% - (var(--space-3) * 2))
 }
 
 section {
     display: block;
+}
+
+button {
+    min-height: var(--control-height-md);
+    border-radius: var(--radius-md);
+    border: none;
+    padding: var(--space-2) var(--space-3);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
 }
 
 /* 以下はBlazor 標準 */

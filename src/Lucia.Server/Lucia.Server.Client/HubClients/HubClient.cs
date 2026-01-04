@@ -64,7 +64,6 @@ public abstract class HubClient : IAsyncDisposable {
     /// 接続開始
     /// </summary>
     public async Task Start() {
-        Console.WriteLine("開始");
         if (_connection.State is not HubConnectionState.Disconnected) {
             _logger.LogWarning("停止していないクライアントは開始できません");
             return;
@@ -100,7 +99,6 @@ public abstract class HubClient : IAsyncDisposable {
     /// 停止
     /// </summary>
     private Task HandleClosed(Exception? e) {
-        Console.WriteLine("終了");
         SafeInvoke(() => StateChanged(HubClientState.Disconnected, e));
         return Task.CompletedTask;
     }
@@ -109,6 +107,10 @@ public abstract class HubClient : IAsyncDisposable {
     /// 破棄処理
     /// </summary>
     public ValueTask DisposeAsync() {
+        _connection.Reconnected -= HandleReconnected;
+        _connection.Reconnecting -= HandleReconnecting;
+        _connection.Closed -= HandleClosed;
+
         return _connection.DisposeAsync();
     }
 

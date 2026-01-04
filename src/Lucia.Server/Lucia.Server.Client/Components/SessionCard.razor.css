@@ -1,0 +1,81 @@
+﻿.session-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-md);
+    border: solid 1px var(--color-border-default);
+    max-width: 300px;
+}
+
+    .session-card.active {
+        border-left: solid 2px var(--color-success);
+    }
+
+    .session-card.disconnect {
+        border-left: solid 2px var(--color-warning);
+    }
+
+    .session-card.idle {
+        border-left: solid 2px var(--color-accent);
+    }
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--color-bg-secondary);
+    padding: var(--space-1) var(--space-3);
+}
+
+    .card-header .card-title {
+        font-weight: var(--font-weight-medium);
+    }
+
+    .card-header .card-badge {
+        padding-inline: var(--space-3);
+        border-radius: var(--radius-full);
+    }
+
+        .card-header .card-badge::before {
+            content: '●';
+            padding-right: var(--space-1)
+        }
+
+.session-card.active .card-header .card-badge {
+    background-color: var(--color-success-light);
+    color: var(--color-success-hover);
+}
+
+.session-card.disconnect .card-header .card-badge {
+    background-color: var(--color-warning-light);
+    color: var(--color-warning-hover);
+}
+
+.session-card.idle .card-header .card-badge {
+    background-color: var(--color-accent-light);
+    color: var(--color-accent-hover);
+}
+
+.card-item {
+    display: flex;
+    justify-content: space-between;
+    padding-inline: var(--space-3);
+}
+
+    .card-item .item-label {
+        color: var(--color-text-secondary);
+        font-weight: var(--font-weight-medium);
+    }
+
+.card-footer {
+    padding: var(--space-1) var(--space-3);
+    border: solid 1px var(--color-border-default);
+}
+
+    .card-footer .logoff-button {
+        background-color: var(--color-error);
+        color: var(--color-text-inverse);
+        width: 100%;
+    }
+
+        .card-footer .logoff-button:active {
+            background-color: var(--color-error-hover);
+        }

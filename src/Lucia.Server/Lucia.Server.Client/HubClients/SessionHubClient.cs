@@ -24,7 +24,7 @@ public class SessionHubClient : HubClient, ISessionHub {
     /// <summary>
     /// セッションの更新時発生
     /// </summary>
-    public Action<SessionInfo[]> UpdateSession = _ => { };
+    public event Action<SessionInfo[]> UpdateSession = _ => { };
 
     /// <summary>
     /// セッションの更新時発生

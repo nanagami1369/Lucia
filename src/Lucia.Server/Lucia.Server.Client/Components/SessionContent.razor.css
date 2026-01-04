@@ -1,0 +1,19 @@
+﻿.content-description {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: var(--space-3);
+}
+
+    .content-description .last-update {
+        color: var(--color-text-secondary);
+    }
+
+.restart-rds-button {
+    background-color: var(--color-warning);
+    color: var(--color-text-inverse);
+}
+
+    .restart-rds-button:active {
+        background-color: var(--color-warning-hover);
+    }

@@ -3,6 +3,10 @@
     border-radius: var(--radius-sm);
 }
 
+    .section-card header {
+        padding-block: var(--space-2);
+    }
+
 .card-title {
     color: var(--color-text-secondary);
     background-color: var(--color-bg-secondary);
@@ -14,7 +18,7 @@
 
 .card-content {
     background-color: var(--color-bg-primary);
-    padding: var(--space-2);
+    padding: var(--space-2) var(--space-3);
     border-bottom-left-radius: var(--radius-sm);
     border-bottom-right-radius: var(--radius-sm);
 }
