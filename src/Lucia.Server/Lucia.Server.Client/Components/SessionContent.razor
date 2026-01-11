@@ -3,6 +3,7 @@
 @inject IServiceProvider Services
 @implements IDisposable
 @rendermode InteractiveWebAssembly
+@inject IJSRuntime JSRuntime
 <div class="content-description">
     <span class="last-update">
         最終更新：@lastUpdated.ToString("HH:mm:ss")
@@ -76,7 +77,14 @@
     private async Task HandleOnClickRestartRdsButton()
     {
         if (SessionHubClient is null) { return; }
-        await SessionHubClient.RestartRdp();
+        try
+        {
+            await SessionHubClient.RestartRdp();
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", ex.Message);
+        }
     }
 
     /// <summary>
@@ -86,7 +94,14 @@
     private async Task HandleRequestSessionLogoff(int sessionId)
     {
         if (SessionHubClient is null) { return; }
-        await SessionHubClient.LogOffSession(sessionId);
+        try
+        {
+            await SessionHubClient.LogOffSession(sessionId);
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", ex.Message);
+        }
     }
 
 }

@@ -121,12 +121,12 @@ public abstract class HubClient : IAsyncDisposable {
     /// </summary>
     /// <param name="methodName">メソッド名称</param>
     /// <param name="args">引数</param>
-    protected Task SendAsync(string methodName, params object?[] args) {
+    protected Task InvokeAsync(string methodName, params object?[] args) {
         if (_connection.State is not HubConnectionState.Connected) {
             _logger.LogWarning("クライアントは接続中ではありません");
             return Task.CompletedTask;
         }
-        return _connection.SendCoreAsync(methodName, args, CancellationToken.None);
+        return _connection.InvokeCoreAsync(methodName, args, CancellationToken.None);
     }
 
     /// <summary>
@@ -135,12 +135,12 @@ public abstract class HubClient : IAsyncDisposable {
     /// <param name="methodName">メソッド名称</param>
     /// <param name="cancellationToken">キャンセルトークン</param>
     /// <param name="args">引数</param>
-    protected Task SendAsync(string methodName, CancellationToken cancellationToken, params object?[] args) {
+    protected Task InvokeAsync(string methodName, CancellationToken cancellationToken, params object?[] args) {
         if (_connection.State is not HubConnectionState.Connected) {
             _logger.LogWarning("クライアントは接続中ではありません");
             return Task.CompletedTask;
         }
-        return _connection.SendCoreAsync(methodName, args, cancellationToken);
+        return _connection.InvokeCoreAsync(methodName, args, cancellationToken);
     }
 
     #endregion

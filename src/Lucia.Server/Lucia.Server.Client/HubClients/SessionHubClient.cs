@@ -44,13 +44,13 @@ public class SessionHubClient : HubClient, ISessionHub {
     /// </summary>
     /// <param name="sessionId">セッションID</param>
     public Task LogOffSession(int sessionId) {
-        return SendAsync(nameof(ISessionHub.LogOffSession), sessionId);
+        return InvokeAsync(nameof(ISessionHub.LogOffSession), sessionId);
     }
 
     /// <summary>
     /// RDS再起動
     /// </summary>
     public Task RestartRdp() {
-        return SendAsync(nameof(ISessionHub.RestartRdp));
+        return InvokeAsync(nameof(ISessionHub.RestartRdp));
     }
 }

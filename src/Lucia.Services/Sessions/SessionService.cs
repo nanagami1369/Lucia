@@ -110,8 +110,8 @@ public class SessionService : ISessionService {
             session.Logoff();
             logger.LogInformation($"セッションログオフ成功 sessionId={sessionId}");
             success = true;
-        } catch (Exception _) {
-            logger.LogError($"エラーが発生しました。sessionId={sessionId}");
+        } catch (Exception ex) {
+            logger.LogError(ex, $"エラーが発生しました。sessionId={sessionId}");
             throw;
         } finally {
             statsLogger.LogAction(success);
@@ -152,8 +152,8 @@ public class SessionService : ISessionService {
             }
             logger.LogInformation($"RDP再起動成功");
             success = true;
-        } catch (Exception _) {
-            logger.LogError($"エラーが発生しました。");
+        } catch (Exception ex) {
+            logger.LogError(ex, $"エラーが発生しました。");
             throw;
         } finally {
             statsLogger.LogAction(success);
