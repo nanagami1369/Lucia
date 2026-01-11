@@ -59,7 +59,7 @@ public class SessionFetchWorker : BackgroundService {
             try {
                 var session = await Task.Run(() => sessionService.GetSessions());
                 await sessionHub.Clients.All.SendAsync(nameof(IClientSessionHub.GetSessions), session, stoppingToken);
-                await Task.Delay(5000, stoppingToken);
+                await Task.Delay(2000, stoppingToken);
 
                 // 成功したらエラー回数をリセット
                 errorCount = 0;
