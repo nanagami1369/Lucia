@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Lucia.Models.Exceptions;
+using Lucia.Models.Models;
 using Lucia.Services.Sessions;
 
 using LuciaServer.Shared;
@@ -50,5 +51,17 @@ public class SessionHub : Hub<IClientSessionHub>, ISessionHub {
             throw new HubException(ex.Message, ex);
         }
     }
+
+    /// <summary>
+    /// セッション一覧を返す
+    /// </summary>
+    public async Task<SessionInfo[]> GetSessions() {
+        try {
+            return await Task.Run(() => sessionService.GetSessions());
+        } catch (UserBaseException ex) {
+            throw new HubException(ex.Message, ex);
+        }
+    }
+
 
 }

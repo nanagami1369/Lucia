@@ -53,4 +53,12 @@ public class SessionHubClient : HubClient, ISessionHub {
     public Task RestartRdp() {
         return InvokeAsync(nameof(ISessionHub.RestartRdp));
     }
+
+    /// <summary>
+    /// セッション一覧を返す
+    /// </summary>
+    public Task<SessionInfo[]> GetSessions() {
+        return InvokeAsync<SessionInfo[]>(nameof(ISessionHub.GetSessions));
+    }
+
 }

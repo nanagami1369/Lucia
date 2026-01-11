@@ -143,6 +143,31 @@ public abstract class HubClient : IAsyncDisposable {
         return _connection.InvokeCoreAsync(methodName, args, cancellationToken);
     }
 
+    /// <summary>
+    /// Hub上のメソッドを呼び出します。
+    /// </summary>
+    /// <param name="methodName">メソッド名称</param>
+    /// <param name="args">引数</param>
+    protected Task<TResult> InvokeAsync<TResult>(string methodName, params object?[] args) {
+        if (_connection.State is not HubConnectionState.Connected) {
+            _logger.LogWarning("クライアントは接続中ではありません");
+        }
+        return _connection.InvokeCoreAsync<TResult>(methodName, args);
+    }
+
+    /// <summary>
+    /// Hub上のメソッドを呼び出します。
+    /// </summary>
+    /// <param name="methodName">メソッド名称</param>
+    /// <param name="cancellationToken">キャンセルトークン</param>
+    /// <param name="args">引数</param>
+    protected Task<TResult> InvokeAsync<TResult>(string methodName, CancellationToken cancellationToken, params object?[] args) {
+        if (_connection.State is not HubConnectionState.Connected) {
+            _logger.LogWarning("クライアントは接続中ではありません");
+        }
+        return _connection.InvokeCoreAsync<TResult>(methodName, args);
+    }
+
     #endregion
 
     #region ユーティリティ系

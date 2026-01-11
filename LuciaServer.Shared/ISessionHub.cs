@@ -18,6 +18,11 @@ public interface ISessionHub {
     /// </summary>
     Task RestartRdp();
 
+    /// <summary>
+    /// セッション一覧を返す
+    /// </summary>
+    Task<SessionInfo[]> GetSessions();
+
 }
 
 /// <summary>
