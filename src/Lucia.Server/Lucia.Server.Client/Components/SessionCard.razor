@@ -38,7 +38,7 @@
     /// </summary>
     private async Task HandleOnClickSessionLogoffButton()
     {
-        await RequestSessionLogoff.InvokeAsync();
+        await RequestSessionLogoff.InvokeAsync(Session.SessionId);
     }
 
     private string? SessionStateClass(SessionInfo sessionInfo)
