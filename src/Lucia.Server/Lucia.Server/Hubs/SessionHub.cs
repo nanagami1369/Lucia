@@ -38,7 +38,6 @@ public class SessionHub : Hub<IClientSessionHub>, ISessionHub {
         } catch (UserBaseException ex) {
             throw new HubException(ex.Message, ex);
         }
-
     }
 
     /// <summary>

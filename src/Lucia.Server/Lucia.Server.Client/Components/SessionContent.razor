@@ -45,6 +45,7 @@
         {
             SessionHubClient = hubClient;
             SessionHubClient.UpdateSession += UpdateSession;
+            SessionHubClient.StateChanged += HandleStateChanged;
         }
 
     }
@@ -57,6 +58,7 @@
         if (SessionHubClient != null)
         {
             SessionHubClient.UpdateSession -= UpdateSession;
+            SessionHubClient.StateChanged -= HandleStateChanged;
         }
     }
 
@@ -69,6 +71,28 @@
         lastUpdated = DateTime.Now;
         SessionList = sessions;
         StateHasChanged();
+    }
+
+    /// <summary>
+    /// Hubのステータスが変更された場合
+    /// </summary>
+    /// <param name="state">状態</param>
+    private async void HandleStateChanged(HubClientState state, Exception? _)
+    {
+        if (SessionHubClient is null) { return; }
+        // 接続された時
+        if (state is HubClientState.Connected)
+        {
+            try
+            {
+                var sessionInfoList = await SessionHubClient.GetSessions();
+                UpdateSession(sessionInfoList);
+            }
+            catch (Exception ex)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", ex.Message);
+            }
+        }
     }
 
     /// <summary>
