@@ -6,7 +6,7 @@ using Lucia.Services;
 
 using Microsoft.Extensions.Logging;
 
-namespace Lucia.Server.Hubs;
+namespace Lucia.Services.Power;
 
 /// <summary>
 /// 電源管理サービス

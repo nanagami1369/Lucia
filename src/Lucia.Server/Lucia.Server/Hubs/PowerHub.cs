@@ -1,4 +1,6 @@
-﻿using LuciaServer.Shared;
+﻿using Lucia.Services.Power;
+
+using LuciaServer.Shared;
 
 using Microsoft.AspNetCore.SignalR;
 

@@ -1,7 +1,6 @@
-﻿
-using Lucia.Models.Abstracts;
+﻿using Lucia.Models.Abstracts;
 
-namespace Lucia.Server.Hubs;
+namespace Lucia.Services.Power;
 
 /// <summary>
 /// 電源管理サービス

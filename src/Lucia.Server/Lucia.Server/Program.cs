@@ -2,6 +2,7 @@ using Lucia.Server.BackgroundServices;
 using Lucia.Server.Components;
 using Lucia.Server.Hubs;
 using Lucia.Services;
+using Lucia.Services.Power;
 using Lucia.Services.Sessions;
 
 using LuciaServer.Shared;
