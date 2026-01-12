@@ -1,0 +1,26 @@
+﻿.power-control-container {
+    display: flex;
+    gap: var(--space-3);
+}
+
+    .power-control-container button {
+        flex: 1;
+    }
+
+.restart-button {
+    background-color: var(--color-warning);
+    color: var(--color-text-inverse);
+}
+
+    .restart-button:active {
+        background-color: var(--color-warning-hover);
+    }
+
+.shutdown-button {
+    background-color: var(--color-error);
+    color: var(--color-text-inverse);
+}
+
+    .shutdown-button:active {
+        background-color: var(--color-error-hover);
+    }

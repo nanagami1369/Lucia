@@ -4,6 +4,8 @@ using Lucia.Server.Hubs;
 using Lucia.Services;
 using Lucia.Services.Sessions;
 
+using LuciaServer.Shared;
+
 namespace Lucia.Server;
 
 public class Program {
@@ -17,7 +19,8 @@ public class Program {
 
         // サービス追加
         builder.Services.AddSingleton<ISessionService, SessionService>();
-        
+        builder.Services.AddSingleton<IPowerService, PowerService>();
+
         // バックグラウンドサービス追加
         builder.Services.AddHostedService<SessionFetchWorker>();
 
@@ -48,6 +51,7 @@ public class Program {
             .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
 
         app.MapHub<SessionHub>("/sessionhub");
+        app.MapHub<PowerHub>("/powerhub");
 
         app.Run();
     }

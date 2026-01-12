@@ -1,0 +1,62 @@
+﻿@using Lucia.Server.Client.HubClients
+@inject IServiceProvider Services
+@rendermode InteractiveWebAssembly
+@inject IJSRuntime JSRuntime
+
+<div class="power-control-container">
+    <button class="restart-button" @onclick="Restart">再起動</button>
+    <button class="shutdown-button" @onclick="Shutdown">シャットダウン</button>
+</div>
+
+@code {
+
+    /// <summary>
+    /// 電源管理ハブ クライアント
+    /// </summary>
+    private PowerHubClient? PowerHubClient { get; set; }
+
+    /// <summary>
+    /// レンダリング時
+    /// </summary>
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender) { return; }
+        if (Services.GetService<PowerHubClient>() is { } hubClient)
+        {
+            PowerHubClient = hubClient;
+        }
+    }
+
+    /// <summary>
+    /// シャットダウン
+    /// </summary>
+    private async Task Shutdown()
+    {
+        if (PowerHubClient is null) { return; }
+        try
+        {
+            await PowerHubClient.Shutdown();
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// 再起動
+    /// </summary>
+    private async Task Restart()
+    {
+        if (PowerHubClient is null) { return; }
+        try
+        {
+            await PowerHubClient.Restart();
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", ex.Message);
+        }
+    }
+
+}

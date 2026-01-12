@@ -9,6 +9,7 @@ internal class Program {
         var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
         builder.Services.AddHubClient<SessionHubClient>();
+        builder.Services.AddHubClient<PowerHubClient>();
 
         await builder.Build().RunAsync();
     }
