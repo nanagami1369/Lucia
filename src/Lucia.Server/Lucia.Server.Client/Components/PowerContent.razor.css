@@ -1,4 +1,27 @@
-﻿.power-control-container {
+﻿.schedule-shutdown-card {
+    border-left: solid 2px var(--color-error);
+    background-color: var(--color-error-light);
+    display: flex;
+    align-items: center;
+    column-gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+}
+
+    .schedule-shutdown-card .cancel-schedule-shutdown-button {
+        background-color: var(--color-error);
+        color: var(--color-text-inverse);
+    }
+
+        .schedule-shutdown-card .cancel-schedule-shutdown-button:active {
+            background-color: var(--color-error-hover);
+        }
+
+.schedule-shutdown-card {
+    margin-bottom: var(--space-4);
+    border-radius: var(--radius-md);
+}
+
+.power-control-container {
     display: flex;
     gap: var(--space-3);
 }
@@ -23,4 +46,14 @@
 
     .shutdown-button:active {
         background-color: var(--color-error-hover);
+    }
+
+
+.schedule-shutdown-button {
+    background-color: var(--color-accent);
+    color: var(--color-text-inverse);
+}
+
+    .schedule-shutdown-button:active {
+        background-color: var(--color-accent-hover);
     }

@@ -1,4 +1,5 @@
 ﻿using Lucia.Server.Hubs;
+using Lucia.Services.Power;
 using Lucia.Services.Sessions;
 
 using LuciaServer.Shared;
@@ -8,13 +9,15 @@ using Microsoft.AspNetCore.SignalR;
 namespace Lucia.Server.BackgroundServices;
 
 /// <summary>
-/// セッション取得ワーカー
+/// データ取得ワーカー
 /// </summary>
-public class SessionFetchWorker : BackgroundService {
+public class FetchWorker : BackgroundService {
 
-    private readonly ILogger<SessionFetchWorker> logger;
+    private readonly ILogger<FetchWorker> logger;
     private readonly IHubContext<SessionHub> sessionHub;
     private readonly ISessionService sessionService;
+    private readonly IHubContext<PowerHub> powerHub;
+    private readonly IPowerService powerService;
 
     /// <summary>
     /// エラー回数
@@ -30,26 +33,32 @@ public class SessionFetchWorker : BackgroundService {
     /// <summary>
     /// コンストラクター
     /// </summary>
-    /// <param name="sessionHub">セッションハブ</param>
     /// <param name="logger">ロガー</param>
+    /// <param name="sessionHub">セッションハブ</param>
     /// <param name="sessionService">セッションサービス</param>
-    public SessionFetchWorker(
+    /// <param name="sessionHub">電源管理ハブ</param>
+    /// <param name="powerService">電源管理サービス</param>
+    public FetchWorker(
+        ILogger<FetchWorker> logger,
         IHubContext<SessionHub> sessionHub,
-        ILogger<SessionFetchWorker> logger,
-        ISessionService sessionService
+        ISessionService sessionService,
+        IHubContext<PowerHub> powerHub,
+        IPowerService powerService
         ) {
         this.sessionHub = sessionHub;
         this.logger = logger;
         this.sessionService = sessionService;
+        this.powerHub = powerHub;
+        this.powerService = powerService;
     }
 
     public override Task StartAsync(CancellationToken cancellationToken) {
-        logger.LogInformation($"{nameof(SessionFetchWorker)} 起動");
+        logger.LogInformation($"{nameof(FetchWorker)} 起動");
         return base.StartAsync(cancellationToken);
     }
 
     public override Task StopAsync(CancellationToken cancellationToken) {
-        logger.LogInformation($"{nameof(SessionFetchWorker)} 終了");
+        logger.LogInformation($"{nameof(FetchWorker)} 終了");
         return base.StopAsync(cancellationToken);
     }
 
@@ -57,8 +66,15 @@ public class SessionFetchWorker : BackgroundService {
 
         while (!stoppingToken.IsCancellationRequested) {
             try {
+
+                // セッションサービス
                 var session = await Task.Run(() => sessionService.GetSessions());
                 await sessionHub.Clients.All.SendAsync(nameof(IClientSessionHub.GetSessions), session, stoppingToken);
+
+                // 電源管理サービス
+                var scheduleShutdown = powerService.GetScheduleShutdown();
+                await powerHub.Clients.All.SendAsync(nameof(IPowerClientHub.GetScheduleShutdown), scheduleShutdown, stoppingToken);
+
                 await Task.Delay(5000, stoppingToken);
 
                 // 成功したらエラー回数をリセット
@@ -69,7 +85,7 @@ public class SessionFetchWorker : BackgroundService {
             } catch (Exception ex) {
                 // エラー回数をカウント
                 errorCount++;
-                logger.LogError(ex, $"セッション情報の配信中にエラーが発生しました（連続エラー: {errorCount}回）");
+                logger.LogError(ex, $"情報の配信中にエラーが発生しました（連続エラー: {errorCount}回）");
 
                 // 連続エラーが一定回数を超えたら停止
                 if (errorCount >= maxErrorCount) {

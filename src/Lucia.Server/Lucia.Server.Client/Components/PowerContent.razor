@@ -3,9 +3,17 @@
 @rendermode InteractiveWebAssembly
 @inject IJSRuntime JSRuntime
 
+@if (remainingTime != null)
+{
+    <div class="schedule-shutdown-card">
+        <span> ⏰ シャットダウン予定: @DateTimeOffset.Now.Add(remainingTime.Value).ToString("hh:mm:ss") (残り @remainingTime?.ToString("hh':'mm':'ss"))</span>
+        <button class="cancel-schedule-shutdown-button" @onclick="CancelScheduleShutdown">キャンセル</button>
+    </div>
+}
 <div class="power-control-container">
     <button class="restart-button" @onclick="Restart">再起動</button>
     <button class="shutdown-button" @onclick="Shutdown">シャットダウン</button>
+    <button class="schedule-shutdown-button" @onclick="() => RegisterScheduleShutdown(DateTimeOffset.Now.AddHours(2))">予約シャットダウン(2時間後)</button>
 </div>
 
 @code {
@@ -16,6 +24,11 @@
     private PowerHubClient? PowerHubClient { get; set; }
 
     /// <summary>
+    /// 残り時間(予約シャットダウン時)
+    /// <summary>
+    private TimeSpan? remainingTime { get; set; }
+
+    /// <summary>
     /// レンダリング時
     /// </summary>
     protected override void OnAfterRender(bool firstRender)
@@ -24,6 +37,52 @@
         if (Services.GetService<PowerHubClient>() is { } hubClient)
         {
             PowerHubClient = hubClient;
+            PowerHubClient.UpdateScheduleShutdown += HandleUpdateScheduleShutdown;
+            PowerHubClient.StateChanged += HandleStateChanged;
+        }
+    }
+
+    /// <summary>
+    /// 破棄処理
+    /// </summary>
+    public void Dispose()
+    {
+        if (PowerHubClient != null)
+        {
+            PowerHubClient.UpdateScheduleShutdown -= HandleUpdateScheduleShutdown;
+            PowerHubClient.StateChanged -= HandleStateChanged;
+        }
+    }
+
+    /// <summary>
+    /// 予約シャットダウンの更新時に発生
+    /// </summary>
+    /// <param name="remainingTime">残り時間</param>
+    private void HandleUpdateScheduleShutdown(TimeSpan? remainingTime)
+    {
+        this.remainingTime = remainingTime;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Hubのステータスが変更された場合
+    /// </summary>
+    /// <param name="state">状態</param>
+    private async void HandleStateChanged(HubClientState state, Exception? _)
+    {
+        if (PowerHubClient is null) { return; }
+        // 接続された時
+        if (state is HubClientState.Connected)
+        {
+            try
+            {
+                var sessionInfoList = await PowerHubClient.GetScheduleShutdown();
+                HandleUpdateScheduleShutdown(sessionInfoList);
+            }
+            catch (Exception ex)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", ex.Message);
+            }
         }
     }
 
@@ -52,6 +111,38 @@
         try
         {
             await PowerHubClient.Restart();
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// シャットダウンを予約する
+    /// </summary>
+    private async Task RegisterScheduleShutdown(DateTimeOffset executeAt)
+    {
+        if (PowerHubClient is null) { return; }
+        try
+        {
+            await PowerHubClient.RegisterScheduleShutdown(executeAt);
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// 現在の予約シャットダウンをキャンセル
+    /// </summary>
+    public async Task CancelScheduleShutdown()
+    {
+        if (PowerHubClient is null) { return; }
+        try
+        {
+            await PowerHubClient.CancelScheduleShutdown();
         }
         catch (Exception ex)
         {

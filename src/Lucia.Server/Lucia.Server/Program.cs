@@ -1,9 +1,12 @@
+using Lucia.Models.Abstracts;
 using Lucia.Server.BackgroundServices;
 using Lucia.Server.Components;
 using Lucia.Server.Hubs;
+using Lucia.Server.TimerServices;
 using Lucia.Services;
 using Lucia.Services.Power;
 using Lucia.Services.Sessions;
+using Lucia.Services.Timer;
 
 using LuciaServer.Shared;
 
@@ -18,12 +21,17 @@ public class Program {
         // ロガー追加
         builder.Services.AddTransient(typeof(StatsLogger<>));
 
+        // タイマーサービスを追加
+        builder.Services.AddSingleton<ITimerContainer, TimerContainer>();
+        builder.Services.AddTransient(typeof(ITimerService<>), typeof(TimerService<>));
+        
         // サービス追加
         builder.Services.AddSingleton<ISessionService, SessionService>();
         builder.Services.AddSingleton<IPowerService, PowerService>();
 
         // バックグラウンドサービス追加
-        builder.Services.AddHostedService<SessionFetchWorker>();
+        builder.Services.AddHostedService<TimerBackgroundService>();
+        builder.Services.AddHostedService<FetchWorker>();
 
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents()

@@ -29,7 +29,7 @@ public class SessionHubClient : HubClient, ISessionHub {
     /// <summary>
     /// セッションの更新時発生
     /// </summary>
-    public void HandleUpdateSession(SessionInfo[] sessionList) {
+    private void HandleUpdateSession(SessionInfo[] sessionList) {
         SafeInvoke(() => UpdateSession(sessionList));
     }
 

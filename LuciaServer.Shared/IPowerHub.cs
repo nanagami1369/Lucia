@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LuciaServer.Shared;
+﻿namespace LuciaServer.Shared;
 
 /// <summary>
 /// 電源管理 ハブ
@@ -18,5 +14,30 @@ public interface IPowerHub {
     /// 再起動
     /// </summary>
     Task Shutdown();
+
+    /// <summary>
+    /// シャットダウンを予約する
+    /// </summary>
+    /// <param name="executeAt">実行予定時刻</param>
+    Task RegisterScheduleShutdown(DateTimeOffset executeAt);
+
+    /// <summary>
+    /// 現在の予約シャットダウンをキャンセル
+    /// </summary>
+    Task CancelScheduleShutdown();
+
+    /// <summary>
+    /// 現在の予約シャットダウンがあったら返す。無ければnull
+    /// </summary>
+    Task<TimeSpan?> GetScheduleShutdown();
+
+}
+
+public interface IPowerClientHub {
+
+    /// <summary>
+    /// 現在の予約シャットダウンをキャンセル
+    /// </summary>
+    Task<TimeSpan?> GetScheduleShutdown();
 
 }

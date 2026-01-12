@@ -17,4 +17,21 @@ public interface IPowerService : IService {
     /// </summary>
     Task Shutdown();
 
+    /// <summary>
+    /// シャットダウンを予約する
+    /// </summary>
+    /// <param name="executeAt">実行予定時刻</param>
+    public void RegisterScheduleShutdown(DateTimeOffset executeAt);
+
+
+    /// <summary>
+    /// 現在の予約シャットダウンをキャンセル
+    /// </summary>
+    void CancelScheduleShutdown();
+
+    /// <summary>
+    /// 現在の予約シャットダウンがあったら返す。無ければnull
+    /// </summary>
+    TimeSpan? GetScheduleShutdown();
+
 }
