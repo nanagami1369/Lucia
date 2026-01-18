@@ -23,5 +23,5 @@ public interface ISessionService : IService {
     /// <summary>
     /// Terminal Service を再起動、成功時true
     /// </summary>
-    void RestartRdp();
+    Task RestartRdp();
 }

@@ -45,7 +45,7 @@ public class SessionHub : Hub<IClientSessionHub>, ISessionHub {
     /// </summary>
     public async Task RestartRdp() {
         try {
-            await Task.Run(() => sessionService.RestartRdp());
+            await sessionService.RestartRdp();
         } catch (UserBaseException ex) {
             throw new HubException(ex.Message, ex);
         }

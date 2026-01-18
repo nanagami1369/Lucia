@@ -4,6 +4,8 @@ using System.ServiceProcess;
 
 using Cassia;
 
+using Cysharp.Diagnostics;
+
 using Lucia.Models.Exceptions;
 using Lucia.Models.Models;
 
@@ -121,139 +123,27 @@ public class SessionService : ISessionService {
     /// <summary>
     /// Rdpサービスを再起動
     /// </summary>
-    public void RestartRdp() {
+    public async Task RestartRdp() {
 
         bool success = false;
         try {
 
-            logger.LogInformation($"RDP再起動開始");
-
-            using var service = new ServiceController("TermService");
-
-            switch (service.Status) {
-                // 止まってたら開始する
-                case ServiceControllerStatus.Stopped:
-                case ServiceControllerStatus.StopPending:
-                    StartService(service);
-                    break;
-                // 動いてたりポーズだったら再起動
-                case ServiceControllerStatus.StartPending:
-                case ServiceControllerStatus.Running:
-                case ServiceControllerStatus.ContinuePending:
-                case ServiceControllerStatus.PausePending:
-                case ServiceControllerStatus.Paused:
-                    // 停止
-                    var serviceOriginalStatus = StopService(service);
-                    // トップサービスは何であれ開始してほしいでもともと開始していた事にする
-                    serviceOriginalStatus = serviceOriginalStatus with { status = ServiceControllerStatus.Running };
-                    // 復旧させる
-                    ReStoreService(service, serviceOriginalStatus);
-                    break;
-            }
-            logger.LogInformation($"RDP再起動成功");
+            logger.LogInformation("RDP再起動開始");
+            await ProcessX.StartAsync("net stop TermService /y").WaitAsync();
+            await ProcessX.StartAsync("net start TermService").WaitAsync();
+            logger.LogInformation("RDP再起動成功");
             success = true;
+
         } catch (Exception ex) {
-            logger.LogError(ex, $"エラーが発生しました。");
+
+            logger.LogError(ex, "エラーが発生しました。");
             throw;
+
         } finally {
+
             statsLogger.LogAction(success);
-        }
-
-        // サービスを開始する
-        static void StartService(ServiceController service) {
-
-            service.Start();
-            service.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
-
-        }
-
-        // サービスを停止する
-        // args:
-        // service サービス
-        // returns: サービス停止前のもとの状態
-        static ServiceOriginalStatusMapForStopping StopService(ServiceController service) {
-
-            // サービスが停止済みなら再起ループから抜ける
-            if (service.Status == ServiceControllerStatus.Stopped) {
-                return new ServiceOriginalStatusMapForStopping(service.ServiceName, service.Status, []);
-            }
-
-            var originalServiceStatus = service.Status;
-
-            // 処理を停止できないものがあるなら停止前にエラー
-            if (!service.CanStop) {
-                throw new ServiceException($"停止できないサービスが含まれてます serviceName={service.DisplayName}");
-            }
-
-            // 子要素を停止
-            var dependentServiceOriginalStatusList = new List<ServiceOriginalStatusMapForStopping>();
-            foreach (var dependentService in service.DependentServices) {
-                using (dependentService) {
-                    dependentServiceOriginalStatusList.Add(StopService(dependentService));
-                }
-            }
-
-            // 子要素の停止が終わったら自分を停止
-            if (service.Status != ServiceControllerStatus.Stopped) {
-                service.Stop();
-                service.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
-            }
-
-            return new ServiceOriginalStatusMapForStopping(service.ServiceName, originalServiceStatus, dependentServiceOriginalStatusList);
-        }
-
-        // サービスを復旧する
-        // args:
-        // service サービス
-        // serviceOriginalStatusMapForStopping サービス停止前のもとの状態
-        static void ReStoreService(ServiceController service, ServiceOriginalStatusMapForStopping serviceOriginalStatusMapForStopping) {
-
-            // 下から停止していたのなら再開する必要は無い
-            // 停止中のサービスの子も停止なので処理を停止
-            if (serviceOriginalStatusMapForStopping.status == ServiceControllerStatus.Stopped) {
-                return;
-            }
-
-            // 各サービスを復旧させる
-            switch (serviceOriginalStatusMapForStopping.status) {
-                // 下から停止していたのなら再開する必要は無い
-                // 停止中のサービスの子も停止なので処理を停止
-                case ServiceControllerStatus.Stopped:
-                case ServiceControllerStatus.StopPending:
-                    return;
-                // 復帰中、開始中はすべて開始に
-                case ServiceControllerStatus.StartPending:
-                case ServiceControllerStatus.Running:
-                case ServiceControllerStatus.ContinuePending:
-                    service.Start();
-                    service.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
-                    break;
-                case ServiceControllerStatus.PausePending:
-                case ServiceControllerStatus.Paused:
-                    // ポーズ系は一度開始してから一時停止
-                    service.Start();
-                    service.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
-                    service.Pause();
-                    service.WaitForStatus(ServiceControllerStatus.Paused, TimeSpan.FromSeconds(30));
-                    break;
-            }
-
-            // 子要素を復旧
-            foreach (var originalStatusMap in serviceOriginalStatusMapForStopping.dependentServices) {
-                using (var dependentService = new ServiceController(originalStatusMap.ServiceName)) {
-                    ReStoreService(dependentService, originalStatusMap);
-                }
-            }
 
         }
     }
-
-    /// <summary>
-    /// サービス停止中のステータス監視のためのクラス
-    /// </summary>
-    private record ServiceOriginalStatusMapForStopping(
-            string ServiceName,
-            ServiceControllerStatus status,
-            List<ServiceOriginalStatusMapForStopping> dependentServices);
 
 }
