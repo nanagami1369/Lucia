@@ -20,11 +20,18 @@ public class Program {
 
         // ロガー追加
         builder.Services.AddTransient(typeof(StatsLogger<>));
+        // イベントソース追加（本番環境のみイベントログ出力）
+        if (!builder.Environment.IsDevelopment()) {
+            builder.Logging.AddEventLog(settings => {
+                settings.SourceName = "LuciaServer";
+                settings.LogName = "Application";
+            });
+        }
 
         // タイマーサービスを追加
         builder.Services.AddSingleton<ITimerContainer, TimerContainer>();
         builder.Services.AddTransient(typeof(ITimerService<>), typeof(TimerService<>));
-        
+
         // サービス追加
         builder.Services.AddSingleton<ISessionService, SessionService>();
         builder.Services.AddSingleton<IPowerService, PowerService>();

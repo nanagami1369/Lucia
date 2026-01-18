@@ -24,6 +24,13 @@ switch ($Action) {
     'install' {
         Write-Log '=== インストール開始 ===' 'INFO'
 
+        # イベントログソース登録
+        Write-Log 'イベントログソースを登録' 'INFO'
+        if (-not [System.Diagnostics.EventLog]::SourceExists($ServiceName)) {
+            [System.Diagnostics.EventLog]::CreateEventSource($ServiceName, 'Application')
+            Write-Log 'イベントログソース登録完了' 'INFO'
+        }
+
         Write-Log "ファイル確認: $ExePath" 'INFO'
         if (-not (Test-Path $ExePath)) {
             Write-Log 'エラー: exeが見つかりません' 'ERROR'
@@ -70,6 +77,11 @@ switch ($Action) {
 
         Write-Log 'ファイアウォール: ルールを削除' 'INFO'
         Remove-NetFirewallRule -DisplayName $ServiceName -ErrorAction SilentlyContinue
+
+        Write-Log 'イベントログソースを削除' 'INFO'
+        if ([System.Diagnostics.EventLog]::SourceExists($ServiceName)) {
+            [System.Diagnostics.EventLog]::DeleteEventSource($ServiceName)
+        }
 
         Write-Log "✓ アンインストール完了 (ログ: $LogFile)" 'SUCCESS'
         Read-Host 'キーを押して終了'
