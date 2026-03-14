@@ -1,9 +1,13 @@
 ﻿@using Lucia.Models.Models
 @using Lucia.Server.Client.HubClients
+@using Lucia.Server.Client.Components.Modals
 @inject IServiceProvider Services
 @implements IDisposable
 @rendermode InteractiveWebAssembly
 @inject IJSRuntime JSRuntime
+
+<ConfirmModal @ref="confirmModal" />
+
 <div class="content-description">
     <span class="last-update">
         最終更新：@lastUpdated.ToString("HH:mm:ss")
@@ -18,6 +22,11 @@
 </div>
 
 @code {
+
+    /// <summary>
+    /// 確認モーダルの参照
+    /// </summary>
+    private ConfirmModal? confirmModal;
 
     /// <summary>
     /// セッション ハブ クライアント
@@ -98,6 +107,11 @@
     /// </summary>
     private async Task HandleOnClickRestartRdsButton()
     {
+        if (confirmModal is null) { return; }
+        var confirmed = await confirmModal.Confirm(
+            ConfirmType.Danger.Create("RDS再起動確認", "RDPサービスを再起動しますか？接続中のセッションは切断されます。", "再起動する", "キャンセル")
+        );
+        if (!confirmed) { return; }
         if (SessionHubClient is null) { return; }
         try
         {
@@ -115,6 +129,11 @@
     /// <param name="sessionId">セッションID</param>
     private async Task HandleRequestSessionLogoff(int sessionId)
     {
+        if (confirmModal is null) { return; }
+        var confirmed = await confirmModal.Confirm(
+            ConfirmType.Danger.Create("切断確認", "このセッションを切断しますか？", "切断する", "キャンセル")
+        );
+        if (!confirmed) { return; }
         if (SessionHubClient is null) { return; }
         try
         {
