@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "removeComments": false,
+    "moduleResolution": "Bundler",
+    "skipLibCheck": true,
+    "noImplicitAny": true,
+    "strict": true,
+    "lib": [
+      "DOM",
+      "ESNext"
+    ],
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "/js/*": [
+        "./wwwroot/js/*"
+      ],
+      "/*": [
+        "./*"
+      ]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "bin",
+    "obj"
+  ]
+}
