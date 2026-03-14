@@ -1,0 +1,92 @@
+@using Lucia.Server.Client.HubClients
+@inject IServiceProvider Services
+@implements IAsyncDisposable
+
+<Modal @ref="modal" Locked="true">
+    <div class="hub-dialog-content">
+        @if (currentState == HubClientState.Disconnected) {
+            <div class="hub-status is-disconnected">
+                <span class="hub-status-icon" aria-hidden="true">⚠</span>
+                <h2 class="hub-status-title">接続が切断されました</h2>
+                <p class="hub-status-message">サーバーへの接続が失われました。<br />自動で再接続を試みています。</p>
+            </div>
+        } else if (currentState == HubClientState.Reconnecting) {
+            <div class="hub-status is-reconnecting">
+                <div class="spinner" aria-hidden="true"></div>
+                <h2 class="hub-status-title">再接続中...</h2>
+                <p class="hub-status-message">サーバーへの再接続を試みています。</p>
+            </div>
+        } else {
+            <div class="hub-status is-connecting">
+                <div class="spinner" aria-hidden="true"></div>
+                <h2 class="hub-status-title">接続中...</h2>
+                <p class="hub-status-message">サーバーに接続しています。しばらくお待ちください。</p>
+            </div>
+        }
+    </div>
+</Modal>
+
+@code {
+
+    /// <summary>
+    /// モーダル参照
+    /// </summary>
+    private Modal? modal;
+
+    /// <summary>
+    /// 状態集約サービス
+    /// </summary>
+    private HubConnectionStatusService? statusService;
+
+    /// <summary>
+    /// 現在の接続状態
+    /// </summary>
+    private HubClientState currentState = HubClientState.Initializing;
+
+    /// <summary>
+    /// レンダリング後の処理：サービス取得・初期状態の適用・イベント購読
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (!firstRender) { return; }
+        if (Services.GetService<HubConnectionStatusService>() is not { } service) { return; }
+        statusService = service;
+        statusService.OverallStateChanged += HandleOverallStateChanged;
+        currentState = statusService.OverallState;
+        await UpdateModalVisibilityAsync();
+    }
+
+    /// <summary>
+    /// 全体状態変化のハンドラー
+    /// </summary>
+    /// <param name="newState">新しい全体接続状態</param>
+    /// <param name="exception">発生した例外（ある場合）</param>
+    private async void HandleOverallStateChanged(HubClientState newState, Exception? exception) {
+        currentState = newState;
+        await InvokeAsync(StateHasChanged);
+        await UpdateModalVisibilityAsync();
+    }
+
+    /// <summary>
+    /// 接続状態に応じてモーダルを開閉します
+    /// </summary>
+    private async Task UpdateModalVisibilityAsync() {
+        if (modal == null) { return; }
+
+        if (currentState == HubClientState.Connected) {
+            await modal.Close();
+        } else {
+            await modal.Open();
+        }
+    }
+
+    /// <summary>
+    /// 破棄処理
+    /// </summary>
+    public ValueTask DisposeAsync() {
+        if (statusService != null) {
+            statusService.OverallStateChanged -= HandleOverallStateChanged;
+        }
+        return ValueTask.CompletedTask;
+    }
+
+}

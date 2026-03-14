@@ -1,7 +1,10 @@
 ﻿@using Lucia.Server.Client.HubClients
+@using Lucia.Server.Client.Components.Modals
 
 @rendermode InteractiveWebAssembly
 @inject IEnumerable<HubClient> HubClients
+
+<HubConnectionModal />
 
 @code {
 

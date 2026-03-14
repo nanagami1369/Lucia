@@ -3,7 +3,11 @@
 @implements IModalContext
 @rendermode InteractiveWebAssembly
 
-<dialog class="dialog" closedby="any" @ref="dialogElement" @oncancel="HandleCancel" @onclose="HandleClose">
+@* TODO(2026-03-15): Locked=true 時は closedby="none" を設定すべきだが、Firefox が closedby 属性未対応のため
+         InvalidCharacterError が発生する。Firefox が closedby をサポートした時点で
+         null を "none" に変更すること。ESC 防止は暫定的に @oncancel:preventDefault で対処。 *@
+<dialog class="dialog" closedby="@(Locked ? null : "any")" @ref="dialogElement" @oncancel="HandleCancel"
+        @oncancel:preventDefault="Locked" @onclose="HandleClose">
     @ChildContent?.Invoke(this)
 </dialog>
 
@@ -38,9 +42,20 @@
     public EventCallback OnClose { get; set; }
 
     /// <summary>
+    /// ユーザー操作による閉じるを禁止するか
+    /// </summary>
+    [Parameter]
+    public bool Locked { get; set; }
+
+    /// <summary>
     /// キャンセルされたか？フラグ(画面が閉じる際にfalseにする)
     /// </summary>
     private bool isCancel = false;
+
+    /// <summary>
+    /// jsModule初期化前にOpen()が呼ばれた場合の保留フラグ
+    /// </summary>
+    private bool pendingOpen = false;
 
     /// <summary>
     /// 状態を初期化する
@@ -74,7 +89,7 @@
     /// </summary>
     public async Task Open()
     {
-        if (jsModule == null) { return; }
+        if (jsModule == null) { pendingOpen = true; return; }
         await jsModule.InvokeVoidAsync("showModal", dialogElement);
     }
 
@@ -83,6 +98,7 @@
     /// </summary>
     private async Task HandleCancel()
     {
+        if (Locked) { return; }
         isCancel = true;
     }
 
@@ -110,6 +126,11 @@
     {
         if (!firstRender) { return; }
         jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "/Components/Modals/Modal.razor.js");
+        if (pendingOpen)
+        {
+            pendingOpen = false;
+            await jsModule.InvokeVoidAsync("showModal", dialogElement);
+        }
     }
 
     /// <summary>

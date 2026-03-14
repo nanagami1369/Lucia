@@ -1,0 +1,103 @@
+/* ===== ダイアログ本体 ===== */
+
+.hub-dialog {
+    background-color: var(--color-bg-primary);
+    border: solid 1px var(--color-border-default);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: var(--space-8);
+    width: min(400px, 100% - var(--space-8));
+    margin: auto;
+    animation: hub-dialog-fade-in var(--transition-duration) var(--transition-timing);
+}
+
+.hub-dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: hub-dialog-backdrop-fade-in var(--transition-duration) var(--transition-timing);
+}
+
+@keyframes hub-dialog-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes hub-dialog-backdrop-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ===== コンテンツレイアウト ===== */
+
+.hub-dialog-content {
+    display: flex;
+    justify-content: center;
+}
+
+.hub-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    text-align: center;
+}
+
+/* ===== 状態アイコン（Disconnected 用） ===== */
+
+.hub-status-icon {
+    font-size: 40px;
+    line-height: 1;
+}
+
+.is-disconnected .hub-status-icon {
+    color: var(--color-error);
+}
+
+/* ===== スピナー（Connecting / Reconnecting 用） ===== */
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--color-border-default);
+    border-top-color: var(--color-accent);
+    border-radius: var(--radius-full);
+    animation: spinner-rotate 0.8s linear infinite;
+}
+
+.is-reconnecting .spinner {
+    border-top-color: var(--color-warning);
+}
+
+@keyframes spinner-rotate {
+    to { transform: rotate(360deg); }
+}
+
+/* ===== タイトル ===== */
+
+.hub-status-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+}
+
+.is-disconnected .hub-status-title {
+    color: var(--color-error);
+}
+
+.is-reconnecting .hub-status-title {
+    color: var(--color-warning);
+}
+
+/* ===== メッセージ ===== */
+
+.hub-status-message {
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-relaxed);
+    font-size: var(--font-size-base);
+}

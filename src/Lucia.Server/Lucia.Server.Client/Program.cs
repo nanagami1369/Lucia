@@ -10,6 +10,7 @@ internal class Program {
 
         builder.Services.AddHubClient<SessionHubClient>();
         builder.Services.AddHubClient<PowerHubClient>();
+        builder.Services.AddScoped<HubConnectionStatusService>();
 
         await builder.Build().RunAsync();
     }
