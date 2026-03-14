@@ -1,0 +1,58 @@
+/* ===== タイトルエリア ===== */
+
+.confirm-header {
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: solid 1px var(--color-border-default);
+}
+
+.confirm-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+}
+
+/* タイプ別タイトル色 */
+.confirm.is-info    .confirm-title { color: var(--color-accent); }
+.confirm.is-warning .confirm-title { color: var(--color-warning); }
+.confirm.is-danger  .confirm-title { color: var(--color-error); }
+
+/* ===== メッセージ ===== */
+
+.confirm-message {
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-relaxed);
+}
+
+/* ===== アクションエリア ===== */
+
+.confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+}
+
+/* キャンセルボタン */
+.confirm-cancel {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    border: solid 1px var(--color-border-default);
+}
+
+    .confirm-cancel:active {
+        background-color: var(--color-bg-tertiary);
+    }
+
+/* OKボタン（タイプ別） */
+.confirm-ok {
+    color: var(--color-text-inverse);
+}
+
+.confirm.is-info    .confirm-ok { background-color: var(--color-accent); }
+.confirm.is-info    .confirm-ok:active { background-color: var(--color-accent-hover); }
+
+.confirm.is-warning .confirm-ok { background-color: var(--color-warning); }
+.confirm.is-warning .confirm-ok:active { background-color: var(--color-warning-hover); }
+
+.confirm.is-danger  .confirm-ok { background-color: var(--color-error); }
+.confirm.is-danger  .confirm-ok:active { background-color: var(--color-error-hover); }

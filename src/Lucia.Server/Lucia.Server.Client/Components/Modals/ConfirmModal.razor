@@ -1,0 +1,78 @@
+<Modal @ref="modal" OnCancel="HandleCancel" OnClose="HandleClose">
+    @if (Options != null)
+    {
+        <div class="confirm @ConfirmTypeCssClass">
+            @if (Options.Title != null)
+            {
+                <header class="confirm-header">
+                    <h1 class="confirm-title">@Options.Title</h1>
+                </header>
+            }
+            <p class="confirm-message">@Options.Message</p>
+            <footer class="confirm-actions">
+                <button class="confirm-cancel" @onclick="async () => await context.Cancel()">@Options.CancelMessage</button>
+                <button class="confirm-ok" @onclick="async () => await context.Close()">@Options.OkMessage</button>
+            </footer>
+        </div>
+    }
+</Modal>
+
+@code {
+
+    /// <summary>
+    /// ユーザーの選択結果を呼び出し元に返すための完了ソース
+    /// </summary>
+    private TaskCompletionSource<bool> taskCompletionSource = new();
+
+    /// <summary>
+    /// モーダル参照
+    /// </summary>
+    private Modal? modal;
+
+    /// <summary>
+    /// 現在表示中の確認オプション
+    /// </summary>
+    private ConfirmOptions? Options { get; set; }
+
+    /// <summary>
+    /// 確認ダイアログを表示し、ユーザーの選択結果を返す
+    /// </summary>
+    /// <param name="options">表示するタイトル・メッセージ・ボタンラベル等のオプション</param>
+    /// <returns>OK を選択した場合は <c>true</c>、キャンセルした場合は <c>false</c></returns>
+    public async Task<bool> Confirm(ConfirmOptions options)
+    {
+        if (modal == null) { return false; }
+        Options = options;
+        taskCompletionSource = new TaskCompletionSource<bool>();
+        StateHasChanged();
+        await modal.Open();
+        return await taskCompletionSource.Task;
+    }
+
+    /// <summary>
+    /// キャンセルボタンが押された、またはダイアログがキャンセル状態で閉じられた際に発生
+    /// </summary>
+    private void HandleCancel()
+    {
+        taskCompletionSource.TrySetResult(false);
+    }
+
+    /// <summary>
+    /// OK ボタンが押された、またはダイアログが正常に閉じられた際に発生
+    /// </summary>
+    private void HandleClose()
+    {
+        taskCompletionSource.TrySetResult(true);
+    }
+
+    /// <summary>
+    /// 現在の ConfirmType に対応する CSS 修飾クラス名
+    /// </summary>
+    private string ConfirmTypeCssClass => Options?.Type switch
+    {
+        ConfirmType.Warm   => "is-warning",
+        ConfirmType.Danger => "is-danger",
+        _                  => "is-info",
+    };
+
+}
