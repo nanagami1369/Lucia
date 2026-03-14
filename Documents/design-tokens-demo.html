@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design Tokens - スターターガイド</title>
+  <style>
+    /* ===== Cascade Layers ===== */
+    @layer base, components;
+    /* ===== Design Tokens ===== */
+    :root {
+      /* Color（15個） */
+      --color-bg-primary: #FFFFFF;
+      --color-bg-secondary: #F8F9FA;
+      --color-bg-tertiary: #F3F4F6;
+
+      --color-text-primary: #212121;
+      --color-text-secondary: #757575;
+      --color-text-muted: #BDBDBD;
+      --color-text-inverse: #FFFFFF;
+
+      --color-border-default: #E0E0E0;
+      --color-border-strong: #D1D5DB;
+
+            --color-accent-light: #E3F2FD;
+      --color-accent: #2196F3;
+      --color-accent-hover: #1976D2;
+
+      --color-success-light: #E8F5E9;
+      --color-success: #4CAF50;
+      --color-success-hover: #3D8C40;
+
+      --color-warning-light: #FFF3E0;
+      --color-warning: #FF9800;
+      --color-warning-hover: #CC7A00;
+
+      --color-error-light: #FFEBEE;
+      --color-error: #F44336;
+      --color-error-hover: #C3362B;
+
+      /* Spacing（6個） */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-6: 24px;
+      --space-8: 32px;
+
+      /* Typography（10個） */
+      --font-family-base: 
+        "Helvetica Neue",
+        Arial,
+        "Hiragino Kaku Gothic ProN",
+        "Hiragino Sans",
+        Meiryo,
+        sans-serif;
+      --font-family-mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+
+      --font-size-sm: 12px;
+      --font-size-base: 13px;
+      --font-size-md: 14px;
+      --font-size-lg: 16px;
+      --font-size-xl: 18px;
+
+      --font-weight-normal: 400;
+      --font-weight-medium: 500;
+      --font-weight-bold: 700;
+
+      --line-height-tight: 1.25;
+      --line-height-base: 1.5;
+      --line-height-relaxed: 1.75;
+
+      /* Border Radius（4個） */
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+
+      /* Control Height（3個） */
+      --control-height-sm: 32px;
+      --control-height-md: 40px;
+      --control-height-lg: 48px;
+
+      /* その他 */
+      --z-dropdown: 1000;
+      --z-modal: 2000;
+      --z-toast: 3000;
+      --transition-duration: 200ms;
+      --transition-timing: ease;
+    }
+
+    /* ===== Base Styles ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-base);
+      line-height: var(--line-height-base);
+      color: var(--color-text-primary);
+      background-color: var(--color-bg-secondary);
+      padding: var(--space-8);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: var(--color-bg-primary);
+      padding: var(--space-8);
+      border-radius: var(--radius-md);
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-8);
+      color: var(--color-text-primary);
+    }
+
+    h2 {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      margin-top: var(--space-8);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-2);
+      border-bottom: 2px solid var(--color-border-default);
+    }
+
+    .section {
+      margin-bottom: var(--space-8);
+    }
+
+    /* ===== Clickable Token Styles ===== */
+    [data-token] {
+      cursor: pointer;
+      transition: transform var(--transition-duration) var(--transition-timing),
+                  box-shadow var(--transition-duration) var(--transition-timing);
+    }
+
+    [data-token]:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    [data-token]:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* ===== Toast Notification ===== */
+    .copy-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--color-text-primary);
+      color: var(--color-text-inverse);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      font-family: var(--font-family-mono);
+      z-index: var(--z-toast);
+      animation: toast-in 0.2s ease, toast-out 0.2s ease 1.3s forwards;
+    }
+
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes toast-out {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-10px); }
+    }
+
+    /* ===== Color Palette ===== */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    .color-item {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .color-swatch {
+      height: 100px;
+      width: 100%;
+    }
+
+    .color-info {
+      padding: var(--space-3);
+      background-color: var(--color-bg-tertiary);
+      font-size: var(--font-size-sm);
+    }
+
+    .color-name {
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-1);
+      word-break: break-word;
+    }
+
+    .color-value {
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    /* ===== Spacing Demo ===== */
+    .spacing-demo {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    .spacing-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-2);
+      border-radius: var(--radius-sm);
+    }
+
+    .spacing-label {
+      min-width: 120px;
+      font-weight: var(--font-weight-medium);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      font-family: var(--font-family-mono);
+    }
+
+    .spacing-box {
+      background-color: var(--color-accent);
+      border-radius: var(--radius-sm);
+      color: var(--color-text-inverse);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 60px;
+      height: 40px;
+    }
+
+    /* ===== Typography Demo ===== */
+    .typography-demo {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    .typography-item {
+      padding: var(--space-4);
+      background-color: var(--color-bg-tertiary);
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--color-accent);
+    }
+
+    .typography-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-2);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .font-size-sm {
+      font-size: var(--font-size-sm);
+    }
+
+    .font-size-base {
+      font-size: var(--font-size-base);
+    }
+
+    .font-size-md {
+      font-size: var(--font-size-md);
+    }
+
+    .font-size-lg {
+      font-size: var(--font-size-lg);
+    }
+
+    .font-size-xl {
+      font-size: var(--font-size-xl);
+    }
+
+    .line-height-tight {
+      line-height: var(--line-height-tight);
+    }
+
+    .line-height-base {
+      line-height: var(--line-height-base);
+    }
+
+    .line-height-relaxed {
+      line-height: var(--line-height-relaxed);
+    }
+
+    .weight-normal {
+      font-weight: var(--font-weight-normal);
+    }
+
+    .weight-medium {
+      font-weight: var(--font-weight-medium);
+    }
+
+    .weight-bold {
+      font-weight: var(--font-weight-bold);
+    }
+
+    /* ===== Radius Demo ===== */
+    .radius-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    .radius-item {
+      text-align: center;
+      padding: var(--space-2);
+      border-radius: var(--radius-sm);
+    }
+
+    .radius-box {
+      height: 100px;
+      background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+      margin-bottom: var(--space-3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-inverse);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .radius-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    /* ===== Control Height Demo ===== */
+    .control-height-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-4);
+    }
+
+    .control-height-item {
+      text-align: center;
+      padding: var(--space-4);
+      background-color: var(--color-bg-tertiary);
+      border-radius: var(--radius-md);
+    }
+
+    .control-height-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+      color: var(--color-text-inverse);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--space-3);
+      width: 100%;
+    }
+
+    .control-height-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      font-family: var(--font-family-mono);
+    }
+
+    /* ===== Component Examples ===== */
+    .component-section {
+      margin-top: var(--space-8);
+      padding-top: var(--space-8);
+      border-top: 2px solid var(--color-border-default);
+    }
+
+    .components-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-6);
+    }
+
+    .component-card {
+      padding: var(--space-4);
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-md);
+      background-color: var(--color-bg-primary);
+    }
+
+    .component-title {
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-3);
+      color: var(--color-text-primary);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: var(--space-2) var(--space-4);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+      transition: background-color var(--transition-duration) var(--transition-timing);
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: var(--color-accent);
+      color: var(--color-text-inverse);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--color-accent-hover);
+    }
+
+    .btn-success {
+      background-color: var(--color-success);
+      color: var(--color-text-inverse);
+    }
+
+    .btn-warning {
+      background-color: var(--color-warning);
+      color: var(--color-text-inverse);
+    }
+
+    .btn-error {
+      background-color: var(--color-error);
+      color: var(--color-text-inverse);
+    }
+
+    .btn + .btn {
+      margin-left: var(--space-2);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .badge-success {
+      background-color: var(--color-success);
+      color: var(--color-text-inverse);
+    }
+
+    .badge-warning {
+      background-color: var(--color-warning);
+      color: var(--color-text-inverse);
+    }
+
+    .badge-error {
+      background-color: var(--color-error);
+      color: var(--color-text-inverse);
+    }
+
+    .input-group {
+      margin-bottom: var(--space-4);
+    }
+
+    label {
+      display: block;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-2);
+    }
+
+    input {
+      width: 100%;
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-base);
+      color: var(--color-text-primary);
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+    }
+
+    .hint {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-top: var(--space-1);
+    }
+
+    /* ===== Lucia Design System Components ===== */
+
+    /* パターンA: Button Group */
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    @media (min-width: 768px) {
+      .button-group {
+        flex-direction: row;
+      }
+    }
+
+    /* Button */
+    .button {
+      width: 100%;
+      min-height: 44px;
+      padding: var(--space-2) var(--space-3);
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+      transition: all var(--transition-duration) var(--transition-timing);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-1);
+    }
+
+    .button:active {
+      transform: scale(0.98);
+    }
+
+    .button-primary {
+      background-color: var(--color-accent);
+      color: var(--color-text-inverse);
+    }
+
+    .button-primary:hover {
+      background-color: var(--color-accent-hover);
+    }
+
+    .button-danger {
+      background-color: var(--color-error);
+      color: var(--color-text-inverse);
+    }
+
+    .button-warning {
+      background-color: var(--color-warning);
+      color: var(--color-text-inverse);
+    }
+
+    @media (min-width: 768px) {
+      .button {
+        width: auto;
+        flex: 1;
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+    }
+
+    /* パターンB: Session List */
+    .session-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    @media (min-width: 768px) {
+      .session-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-4);
+      }
+    }
+
+    /* Session Card */
+    .session-card {
+      background-color: var(--color-bg-primary);
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .session-card-active {
+      border-left: 4px solid var(--color-success);
+    }
+
+    .session-card-disconnected {
+      border-left: 4px solid var(--color-warning);
+    }
+
+    .session-card-header {
+      padding: var(--space-3) var(--space-4);
+      background-color: var(--color-bg-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .session-card-user {
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-md);
+      color: var(--color-text-primary);
+    }
+
+    .session-card-body {
+      padding: var(--space-3) var(--space-4);
+    }
+
+    .session-card-row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--space-2) 0;
+      font-size: var(--font-size-sm);
+    }
+
+    .session-card-label {
+      color: var(--color-text-secondary);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .session-card-value {
+      color: var(--color-text-primary);
+      text-align: right;
+      font-family: var(--font-family-mono);
+    }
+
+    .session-card-footer {
+      padding: var(--space-3) var(--space-4);
+      border-top: 1px solid var(--color-border-default);
+    }
+
+    .session-card-footer .button {
+      width: 100%;
+    }
+
+    /* Status Badge */
+    .status {
+      display: inline-flex;
+      align-items: center;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      white-space: nowrap;
+    }
+
+    .status-active {
+      color: var(--color-success);
+    }
+
+    .status-disconnected {
+      color: var(--color-warning);
+    }
+
+    .status-idle {
+      color: var(--color-accent);
+    }
+
+    /* パターンC: Session Table（1024px以上で表示）*/
+    .session-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--font-size-base);
+    }
+
+    .session-table thead {
+      background-color: var(--color-accent);
+    }
+
+    .session-table th {
+      padding: var(--space-3) var(--space-4);
+      text-align: left;
+      color: var(--color-text-inverse);
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-sm);
+    }
+
+    .session-table td {
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--color-border-default);
+    }
+
+    .session-table tbody tr:hover {
+      background-color: var(--color-bg-secondary);
+    }
+
+    /* パターンD: Section Header */
+    .section-header {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background-color: var(--color-bg-secondary);
+      border-radius: var(--radius-md);
+    }
+
+    @media (min-width: 768px) {
+      .section-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .section-header-title {
+      flex: 1;
+    }
+
+    .section-header-actions {
+      display: flex;
+      gap: var(--space-2);
+      width: 100%;
+    }
+
+    @media (min-width: 768px) {
+      .section-header-actions {
+        width: auto;
+      }
+
+      .section-header-actions .button {
+        width: auto;
+        flex: none;
+      }
+    }
+
+    /* ===== Component Section - Desktop Override ===== */
+    @layer components {
+      .component-section {
+        --font-size-sm: 12px;
+        --font-size-base: 16px;
+        --font-size-md: 18px;
+        --font-size-lg: 20px;
+        --font-size-xl: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Design Tokens - スターターガイド</h1>
+    <p style="margin-bottom: var(--space-6); color: var(--color-text-secondary);">
+      💡 各トークンをクリックすると、CSS変数名がクリップボードにコピーされます
+    </p>
+
+    <!-- Colors Section -->
+    <section class="section">
+      <h2>Color（21個）</h2>
+      
+      <h3 style="font-size: var(--font-size-lg); margin-top: var(--space-6); margin-bottom: var(--space-3);">背景色</h3>
+      <div class="color-grid">
+        <div class="color-item" data-token="--color-bg-primary">
+          <div class="color-swatch" style="background-color: var(--color-bg-primary);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-bg-primary</div>
+            <div class="color-value">#FFFFFF</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-bg-secondary">
+          <div class="color-swatch" style="background-color: var(--color-bg-secondary);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-bg-secondary</div>
+            <div class="color-value">#F8F9FA</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-bg-tertiary">
+          <div class="color-swatch" style="background-color: var(--color-bg-tertiary);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-bg-tertiary</div>
+            <div class="color-value">#F3F4F6</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size: var(--font-size-lg); margin-top: var(--space-6); margin-bottom: var(--space-3);">テキスト色</h3>
+      <div class="color-grid">
+        <div class="color-item" data-token="--color-text-primary">
+          <div class="color-swatch" style="background-color: var(--color-text-primary);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-text-primary</div>
+            <div class="color-value">#212121</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-text-secondary">
+          <div class="color-swatch" style="background-color: var(--color-text-secondary);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-text-secondary</div>
+            <div class="color-value">#757575</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-text-muted">
+          <div class="color-swatch" style="background-color: var(--color-text-muted);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-text-muted</div>
+            <div class="color-value">#BDBDBD</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-text-inverse">
+          <div class="color-swatch" style="background-color: var(--color-text-inverse); border: 1px solid var(--color-border-default);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-text-inverse</div>
+            <div class="color-value">#FFFFFF</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size: var(--font-size-lg); margin-top: var(--space-6); margin-bottom: var(--space-3);">ボーダー</h3>
+      <div class="color-grid">
+        <div class="color-item" data-token="--color-border-default">
+          <div class="color-swatch" style="background-color: var(--color-border-default);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-border-default</div>
+            <div class="color-value">#E0E0E0</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-border-strong">
+          <div class="color-swatch" style="background-color: var(--color-border-strong);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-border-strong</div>
+            <div class="color-value">#D1D5DB</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size: var(--font-size-lg); margin-top: var(--space-6); margin-bottom: var(--space-3);">インタラクティブ・ステータス</h3>
+      <div class="color-grid">
+        <div class="color-item" data-token="--color-accent-light">
+          <div class="color-swatch" style="background-color: var(--color-accent-light);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-accent-light</div>
+            <div class="color-value">#E3F2FD</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-accent">
+          <div class="color-swatch" style="background-color: var(--color-accent);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-accent</div>
+            <div class="color-value">#2196F3</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-accent-hover">
+          <div class="color-swatch" style="background-color: var(--color-accent-hover);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-accent-hover</div>
+            <div class="color-value">#1976D2</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-success-light">
+          <div class="color-swatch" style="background-color: var(--color-success-light);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-success-light</div>
+            <div class="color-value">#E8F5E9</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-success">
+          <div class="color-swatch" style="background-color: var(--color-success);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-success</div>
+            <div class="color-value">#4CAF50</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-success-hover">
+          <div class="color-swatch" style="background-color: var(--color-success-hover);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-success-hover</div>
+            <div class="color-value">#3D8C40</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-warning-light">
+          <div class="color-swatch" style="background-color: var(--color-warning-light);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-warning-light</div>
+            <div class="color-value">#FFF3E0</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-warning">
+          <div class="color-swatch" style="background-color: var(--color-warning);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-warning</div>
+            <div class="color-value">#FF9800</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-warning-hover">
+          <div class="color-swatch" style="background-color: var(--color-warning-hover);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-warning-hover</div>
+            <div class="color-value">#CC7A00</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-error-light">
+          <div class="color-swatch" style="background-color: var(--color-error-light);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-error-light</div>
+            <div class="color-value">#FFEBEE</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-error">
+          <div class="color-swatch" style="background-color: var(--color-error);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-error</div>
+            <div class="color-value">#F44336</div>
+          </div>
+        </div>
+        <div class="color-item" data-token="--color-error-hover">
+          <div class="color-swatch" style="background-color: var(--color-error-hover);"></div>
+          <div class="color-info">
+            <div class="color-name">--color-error-hover</div>
+            <div class="color-value">#C3362B</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Spacing Section -->
+    <section class="section">
+      <h2>Spacing（6個）</h2>
+      <div class="spacing-demo">
+        <div class="spacing-row" data-token="--space-1">
+          <div class="spacing-label">--space-1</div>
+          <div class="spacing-box" style="width: var(--space-1); min-width: unset;"></div>
+          <span style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">4px</span>
+        </div>
+        <div class="spacing-row" data-token="--space-2">
+          <div class="spacing-label">--space-2</div>
+          <div class="spacing-box" style="width: var(--space-2); min-width: unset;"></div>
+          <span style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">8px</span>
+        </div>
+        <div class="spacing-row" data-token="--space-3">
+          <div class="spacing-label">--space-3</div>
+          <div class="spacing-box" style="width: var(--space-3); min-width: unset;"></div>
+          <span style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">12px</span>
+        </div>
+        <div class="spacing-row" data-token="--space-4">
+          <div class="spacing-label">--space-4</div>
+          <div class="spacing-box" style="width: var(--space-4); min-width: unset;"></div>
+          <span style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">16px</span>
+        </div>
+        <div class="spacing-row" data-token="--space-6">
+          <div class="spacing-label">--space-6</div>
+          <div class="spacing-box" style="width: var(--space-6); min-width: unset;"></div>
+          <span style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">24px</span>
+        </div>
+        <div class="spacing-row" data-token="--space-8">
+          <div class="spacing-label">--space-8</div>
+          <div class="spacing-box" style="width: var(--space-8); min-width: unset;"></div>
+          <span style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">32px</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Typography Section -->
+    <section class="section">
+      <h2>Typography（10個）</h2>
+      
+      <div style="margin-bottom: var(--space-4); display: flex; gap: var(--space-2); flex-wrap: wrap;">
+        <button class="size-switcher-btn" data-size="mobile" style="padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border-default); border-radius: var(--radius-sm); background-color: var(--color-accent); color: var(--color-text-inverse); cursor: pointer; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);">Mobile</button>
+        <button class="size-switcher-btn" data-size="tablet" style="padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border-default); border-radius: var(--radius-sm); background-color: var(--color-bg-secondary); color: var(--color-text-primary); cursor: pointer; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);">Tablet</button>
+        <button class="size-switcher-btn" data-size="desktop" style="padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border-default); border-radius: var(--radius-sm); background-color: var(--color-bg-secondary); color: var(--color-text-primary); cursor: pointer; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);">Desktop</button>
+      </div>
+
+      <h3 style="font-size: var(--font-size-lg); margin-top: var(--space-4); margin-bottom: var(--space-3);">Font Size</h3>
+      <div class="typography-demo">
+        <div class="typography-item" data-token="--font-size-sm">
+          <div class="typography-label">--font-size-sm (12px)</div>
+          <div class="font-size-sm">あいうえおABCDEFG</div>
+        </div>
+        <div class="typography-item" data-token="--font-size-base">
+          <div class="typography-label">--font-size-base (13px)</div>
+          <div class="font-size-base">あいうえおABCDEFG</div>
+        </div>
+        <div class="typography-item" data-token="--font-size-md">
+          <div class="typography-label">--font-size-md (14px)</div>
+          <div class="font-size-md">あいうえおABCDEFG</div>
+        </div>
+        <div class="typography-item" data-token="--font-size-lg">
+          <div class="typography-label">--font-size-lg (16px)</div>
+          <div class="font-size-lg">あいうえおABCDEFG</div>
+        </div>
+        <div class="typography-item" data-token="--font-size-xl">
+          <div class="typography-label">--font-size-xl (18px)</div>
+          <div class="font-size-xl">あいうえおABCDEFG</div>
+        </div>
+      </div>
+
+      <h3 style="font-size: var(--font-size-lg); margin-top: var(--space-6); margin-bottom: var(--space-3);">Line Height</h3>
+      <div class="typography-demo">
+        <div class="typography-item" data-token="--line-height-tight">
+          <div class="typography-label">--line-height-tight (1.25)</div>
+          <div class="line-height-tight">
+            デザインシステムを構築する際に、<br>
+            タイポグラフィはとても重要な要素です。<br>
+            行間の調整により、可読性が大きく変わります。
+          </div>
+        </div>
+        <div class="typography-item" data-token="--line-height-base">
+          <div class="typography-label">--line-height-base (1.5)</div>
+          <div class="line-height-base">デザインシステムを構築する際に、タイポグラフィはとても重要な要素です。行間の調整により、可読性が大きく変わります。</div>
+        </div>
+        <div class="typography-item" data-token="--line-height-relaxed">
+          <div class="typography-label">--line-height-relaxed (1.75)</div>
+          <div class="line-height-relaxed">デザインシステムを構築する際に、タイポグラフィはとても重要な要素です。行間の調整により、可読性が大きく変わります。</div>
+        </div>
+      </div>
+
+      <h3 style="font-size: var(--font-size-lg); margin-top: var(--space-6); margin-bottom: var(--space-3);">Font Weight</h3>
+      <div class="typography-demo">
+        <div class="typography-item" data-token="--font-weight-normal">
+          <div class="typography-label">--font-weight-normal (400)</div>
+          <div class="weight-normal" style="font-size: var(--font-size-lg);">Normal Weight - 通常の太さ</div>
+        </div>
+        <div class="typography-item" data-token="--font-weight-medium">
+          <div class="typography-label">--font-weight-medium (500)</div>
+          <div class="weight-medium" style="font-size: var(--font-size-lg);">Medium Weight - 中程度の太さ</div>
+        </div>
+        <div class="typography-item" data-token="--font-weight-bold">
+          <div class="typography-label">--font-weight-bold (700)</div>
+          <div class="weight-bold" style="font-size: var(--font-size-lg);">Bold Weight - 太字</div>
+        </div>
+      </div>
+
+      <h3 style="font-size: var(--font-size-lg); margin-top: var(--space-6); margin-bottom: var(--space-3);">Font Family</h3>
+      <div class="typography-demo">
+        <div class="typography-item" data-token="--font-family-base">
+          <div class="typography-label">--font-family-base</div>
+          <div style="font-family: var(--font-family-base); word-break: break-word;">"Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif</div>
+        </div>
+        <div class="typography-item" data-token="--font-family-mono">
+          <div class="typography-label">--font-family-mono</div>
+          <div style="font-family: var(--font-family-mono); word-break: break-word;">SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Border Radius Section -->
+    <section class="section">
+      <h2>Border Radius（4個）</h2>
+      <div class="radius-grid">
+        <div class="radius-item" data-token="--radius-sm">
+          <div class="radius-box" style="border-radius: var(--radius-sm);">sm</div>
+          <div class="radius-label">--radius-sm (4px)</div>
+        </div>
+        <div class="radius-item" data-token="--radius-md">
+          <div class="radius-box" style="border-radius: var(--radius-md);">md</div>
+          <div class="radius-label">--radius-md (6px)</div>
+        </div>
+        <div class="radius-item" data-token="--radius-lg">
+          <div class="radius-box" style="border-radius: var(--radius-lg);">lg</div>
+          <div class="radius-label">--radius-lg (12px)</div>
+        </div>
+        <div class="radius-item" data-token="--radius-full">
+          <div class="radius-box" style="border-radius: var(--radius-full);">full</div>
+          <div class="radius-label">--radius-full (9999px)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Control Height Section -->
+    <section class="section">
+      <h2>Control Height（3個）</h2>
+      <p style="color: var(--color-text-secondary); margin-bottom: var(--space-4);">ボタン、input、selectなどフォームコントロールの高さ</p>
+      <div class="control-height-grid">
+        <div class="control-height-item" data-token="--control-height-sm">
+          <div class="control-height-box" style="height: var(--control-height-sm);">sm</div>
+          <div class="control-height-label">--control-height-sm (32px)</div>
+        </div>
+        <div class="control-height-item" data-token="--control-height-md">
+          <div class="control-height-box" style="height: var(--control-height-md);">md</div>
+          <div class="control-height-label">--control-height-md (40px)</div>
+        </div>
+        <div class="control-height-item" data-token="--control-height-lg">
+          <div class="control-height-box" style="height: var(--control-height-lg);">lg</div>
+          <div class="control-height-label">--control-height-lg (48px)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Other Tokens Section -->
+    <section class="section">
+      <h2>その他</h2>
+      <div class="typography-demo">
+        <div class="typography-item" data-token="--z-dropdown">
+          <div class="typography-label">--z-dropdown</div>
+          <div>1000</div>
+        </div>
+        <div class="typography-item" data-token="--z-modal">
+          <div class="typography-label">--z-modal</div>
+          <div>2000</div>
+        </div>
+        <div class="typography-item" data-token="--z-toast">
+          <div class="typography-label">--z-toast</div>
+          <div>3000</div>
+        </div>
+        <div class="typography-item" data-token="--transition-duration">
+          <div class="typography-label">--transition-duration</div>
+          <div>200ms</div>
+        </div>
+        <div class="typography-item" data-token="--transition-timing">
+          <div class="typography-label">--transition-timing</div>
+          <div>ease</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Breakpoints Section -->
+    <section class="section">
+      <h2>Breakpoints</h2>
+      <div class="typography-demo">
+        <div class="typography-item" data-token="/* タブレット (768px以上) */
+@media (min-width: 768px) {
+}
+
+/* デスクトップ (1024px以上) */
+@media (min-width: 1024px) {
+}" style="cursor: pointer;">
+          <div class="typography-label">レスポンシブ用メディアクエリ（クリックでコピー）</div>
+          <pre style="font-family: var(--font-family-mono); font-size: var(--font-size-sm); margin: 0; white-space: pre; overflow-x: auto;"><code>/* タブレット (768px以上) */
+@media (min-width: 768px) {
+}
+
+/* デスクトップ (1024px以上) */
+@media (min-width: 1024px) {
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Summary -->
+    <section class="section">
+      <h2>トークン統計</h2>
+      <table style="width: 100%; border-collapse: collapse; margin-top: var(--space-4);">
+        <thead>
+          <tr style="background-color: var(--color-bg-tertiary);">
+            <th style="padding: var(--space-3); text-align: left; border: 1px solid var(--color-border-default);">カテゴリ</th>
+            <th style="padding: var(--space-3); text-align: left; border: 1px solid var(--color-border-default);">個数</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding: var(--space-3); border: 1px solid var(--color-border-default);">Color</td>
+            <td style="padding: var(--space-3); border: 1px solid var(--color-border-default);">21</td>
+          </tr>
+          <tr style="background-color: var(--color-bg-secondary);">
+            <td style="padding: var(--space-3); border: 1px solid var(--color-border-default);">Spacing</td>
+            <td style="padding: var(--space-3); border: 1px solid var(--color-border-default);">6</td>
+          </tr>
+          <tr>
+            <td style="padding: var(--space-3); border: 1px solid var(--color-border-default);">Typography</td>
+            <td style="padding: var(--space-3); border: 1px solid var(--color-border-default);">13</td>
+          </tr>
+          <tr style="background-color: var(--color-bg-secondary);">
+            <td style="padding: var(--space-3); border: 1px solid var(--color-border-default);">Border Radius</td>
+            <td style="padding: var(--space-3); border: 1px solid var(--color-border-default);">4</td>
+          </tr>
+          <tr>
+            <td style="padding: var(--space-3); border: 1px solid var(--color-border-default);">Control Height</td>
+            <td style="padding: var(--space-3); border: 1px solid var(--color-border-default);">3</td>
+          </tr>
+          <tr style="background-color: var(--color-bg-secondary);">
+            <td style="padding: var(--space-3); border: 1px solid var(--color-border-default);">その他</td>
+            <td style="padding: var(--space-3); border: 1px solid var(--color-border-default);">5</td>
+          </tr>
+          <tr style="background-color: var(--color-accent); color: var(--color-text-inverse); font-weight: var(--font-weight-bold);">
+            <td style="padding: var(--space-3); border: 1px solid var(--color-accent);">合計</td>
+            <td style="padding: var(--space-3); border: 1px solid var(--color-accent);">52個</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <script>
+    // フォントサイズ切り替え機能
+    document.addEventListener('DOMContentLoaded', () => {
+      const buttons = document.querySelectorAll('.size-switcher-btn');
+      const typographyItems = document.querySelectorAll('.typography-demo .typography-item[data-token^="--font-size"]');
+
+      const fontSizes = {
+        '--font-size-sm': { mobile: '12px', tablet: '13px', desktop: '14px' },
+        '--font-size-base': { mobile: '13px', tablet: '14px', desktop: '16px' },
+        '--font-size-md': { mobile: '14px', tablet: '16px', desktop: '18px' },
+        '--font-size-lg': { mobile: '16px', tablet: '18px', desktop: '20px' },
+        '--font-size-xl': { mobile: '18px', tablet: '20px', desktop: '22px' }
+      };
+
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const currentSize = btn.dataset.size;
+
+          // ボタンのスタイルを更新
+          buttons.forEach(b => {
+            if (b.dataset.size === currentSize) {
+              b.style.backgroundColor = 'var(--color-accent)';
+              b.style.color = 'var(--color-text-inverse)';
+            } else {
+              b.style.backgroundColor = 'var(--color-bg-secondary)';
+              b.style.color = 'var(--color-text-primary)';
+            }
+          });
+
+          // Typography表示を更新
+          typographyItems.forEach(item => {
+            const token = item.dataset.token;
+            const sizes = fontSizes[token];
+            if (!sizes) return;
+
+            const newValue = sizes[currentSize];
+            const label = item.querySelector('.typography-label');
+            const textElement = item.querySelector('div:not(.typography-label)');
+
+            if (label) {
+              label.textContent = `${token} (${newValue})`;
+            }
+            if (textElement) {
+              textElement.style.fontSize = newValue;
+            }
+          });
+        });
+      });
+    });
+
+    // クリックでトークン名をクリップボードにコピー
+    document.addEventListener('click', async (e) => {
+      const item = e.target.closest('[data-token]');
+      if (!item) return;
+
+      const token = item.dataset.token;
+      
+      try {
+        await navigator.clipboard.writeText(token);
+        showToast(`Copied: ${token}`);
+      } catch (err) {
+        // フォールバック: 古いブラウザ対応
+        const textarea = document.createElement('textarea');
+        textarea.value = token;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast(`Copied: ${token}`);
+      }
+    });
+
+    function showToast(message) {
+      // 既存のトーストを削除
+      const existing = document.querySelector('.copy-toast');
+      if (existing) {
+        existing.remove();
+      }
+
+      const toast = document.createElement('div');
+      toast.className = 'copy-toast';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      // 1.5秒後に削除
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.remove();
+        }
+      }, 1500);
+    }
+  </script>
+</body>
+</html>
