@@ -56,8 +56,8 @@
     public async Task Cancel()
     {
         if (jsModule == null) { return; }
-        await HandleCancel();
-        await HandleClose();
+        isCancel = true;
+        await jsModule.InvokeVoidAsync("close", dialogElement);
     }
 
     /// <summary>
@@ -65,7 +65,8 @@
     /// </summary>
     public async Task Close()
     {
-        await HandleClose();
+        if (jsModule == null) { return; }
+        await jsModule.InvokeVoidAsync("close", dialogElement);
     }
 
     /// <summary>
