@@ -1,0 +1,66 @@
+.dialog {
+    background-color: var(--color-bg-primary);
+    border: solid 1px var(--color-border-default);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: var(--space-6);
+    width: min(480px, 100% - var(--space-8));
+    max-height: 90dvh;
+    overflow-y: auto;
+    margin: auto;
+    opacity: 0;
+    transition:
+        display var(--transition-duration) allow-discrete,
+        overlay var(--transition-duration) allow-discrete;
+    animation: dialog-fade-out var(--transition-duration) var(--transition-timing) both;
+}
+
+    .dialog[open] {
+        animation: dialog-slide-up 0.25s cubic-bezier(0.05, 0.89, 0.25, 1.02), dialog-fade-in var(--transition-duration) var(--transition-timing);
+        animation-fill-mode: both;
+    }
+
+.dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.4);
+    animation: dialog-backdrop-fade-in var(--transition-duration) var(--transition-timing);
+}
+
+@keyframes dialog-slide-up {
+    from {
+        transform: translateY(16px) scale(0.97);
+    }
+
+    to {
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes dialog-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes dialog-fade-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes dialog-backdrop-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

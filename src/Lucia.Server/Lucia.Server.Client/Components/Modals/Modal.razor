@@ -1,0 +1,124 @@
+﻿@inject IJSRuntime Js
+@implements IAsyncDisposable
+@implements IModalContext
+@rendermode InteractiveWebAssembly
+
+<dialog class="dialog" closedby="any" @ref="dialogElement" @oncancel="HandleCancel" @onclose="HandleClose">
+    @ChildContent?.Invoke(this)
+</dialog>
+
+@code {
+
+    /// <summary>
+    /// jsモジュール
+    /// </summary>
+    private IJSObjectReference? jsModule;
+
+    /// <summary>
+    /// ダイアログ参照
+    /// </summary>
+    private ElementReference dialogElement;
+
+    /// <summary>
+    /// 子要素
+    /// </summary>
+    [Parameter]
+    public RenderFragment<IModalContext>? ChildContent { get; set; }
+
+    /// <summary>
+    /// [キャンセル状態で]モーダルを閉じた際に発生
+    /// </summary>
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    /// <summary>
+    /// [未キャンセル状態で]モーダルを閉じた際に発生
+    /// </summary>
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    /// <summary>
+    /// キャンセルされたか？フラグ(画面が閉じる際にfalseにする)
+    /// </summary>
+    private bool isCancel = false;
+
+    /// <summary>
+    /// 状態を初期化する
+    /// </summary>
+    private void OnInitState()
+    {
+        isCancel = false;
+    }
+
+    /// <summary>
+    /// キャンセル(外部から呼ばれる場合)
+    /// </summary>
+    public async Task Cancel()
+    {
+        if (jsModule == null) { return; }
+        await HandleCancel();
+        await HandleClose();
+    }
+
+    /// <summary>
+    /// 閉じる(外部から呼ばれる場合)
+    /// </summary>
+    public async Task Close()
+    {
+        await HandleClose();
+    }
+
+    /// <summary>
+    /// 開く
+    /// </summary>
+    public async Task Open()
+    {
+        if (jsModule == null) { return; }
+        await jsModule.InvokeVoidAsync("showModal", dialogElement);
+    }
+
+    /// <summary>
+    /// キャンセル
+    /// </summary>
+    private async Task HandleCancel()
+    {
+        isCancel = true;
+    }
+
+    /// <summary>
+    /// 閉じる
+    /// </summary>
+    private async Task HandleClose()
+    {
+        if (isCancel)
+        {
+            await OnCancel.InvokeAsync();
+        }
+        else
+        {
+            await OnClose.InvokeAsync();
+        }
+        // 状態を初期化
+        OnInitState();
+    }
+
+    /// <summary>
+    /// レンダリング後
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) { return; }
+        jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "/Components/Modals/Modal.razor.js");
+    }
+
+    /// <summary>
+    /// 破棄処理
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        if (jsModule == null) { return; }
+        await jsModule.DisposeAsync();
+        jsModule = null;
+    }
+
+}
