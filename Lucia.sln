@@ -12,6 +12,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucia.Services", "src\Lucia.Services\Lucia.Services.csproj", "{4316CB64-F5A6-4690-B4EB-F1EDE87DC1CA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{68392B75-8D79-43FC-9CDE-D529EA3F202B}"
+	ProjectSection(SolutionItems) = preProject
+		Documents\design-tokens-demo.html = Documents\design-tokens-demo.html
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuciaServer.Shared", "LuciaServer.Shared\LuciaServer.Shared.csproj", "{032D1318-0EB9-4C74-AE66-72E6F20DCEB5}"
 EndProject
