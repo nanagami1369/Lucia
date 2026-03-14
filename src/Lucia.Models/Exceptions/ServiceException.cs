@@ -10,7 +10,7 @@ namespace Lucia.Models.Exceptions;
 public class ServiceException : UserBaseException {
 
     public ServiceException(string message) : base(message) {
-    
+
     }
 
 }
