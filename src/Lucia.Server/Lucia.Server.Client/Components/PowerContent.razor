@@ -1,7 +1,10 @@
 ﻿@using Lucia.Server.Client.HubClients
+@using Lucia.Server.Client.Components.Modals
 @inject IServiceProvider Services
 @rendermode InteractiveWebAssembly
 @inject IJSRuntime JSRuntime
+
+<ConfirmModal @ref="confirmModal" />
 
 @if (remainingTime != null)
 {
@@ -11,12 +14,17 @@
     </div>
 }
 <div class="power-control-container">
-    <button class="restart-button" @onclick="Restart">再起動</button>
-    <button class="shutdown-button" @onclick="Shutdown">シャットダウン</button>
-    <button class="schedule-shutdown-button" @onclick="() => RegisterScheduleShutdown(DateTimeOffset.Now.AddHours(2))">予約シャットダウン(2時間後)</button>
+    <button class="restart-button" @onclick="ConfirmRestart">再起動</button>
+    <button class="shutdown-button" @onclick="ConfirmShutdown">シャットダウン</button>
+    <button class="schedule-shutdown-button" @onclick="ConfirmRegisterScheduleShutdown">予約シャットダウン(2時間後)</button>
 </div>
 
 @code {
+
+    /// <summary>
+    /// 確認モーダルの参照
+    /// </summary>
+    private ConfirmModal? confirmModal;
 
     /// <summary>
     /// 電源管理ハブ クライアント
@@ -87,6 +95,46 @@
     }
 
     /// <summary>
+    /// シャットダウンの確認モーダルを表示し、承認された場合にシャットダウンを実行する
+    /// </summary>
+    private async Task ConfirmShutdown()
+    {
+        if (confirmModal is null) { return; }
+        var confirmed = await confirmModal.Confirm(
+            ConfirmType.Danger.Create("シャットダウン確認", "このサーバーをシャットダウンしますか？", "シャットダウンする", "キャンセル")
+        );
+        if (!confirmed) { return; }
+        await Shutdown();
+    }
+
+    /// <summary>
+    /// 再起動の確認モーダルを表示し、承認された場合に再起動を実行する
+    /// </summary>
+    private async Task ConfirmRestart()
+    {
+        if (confirmModal is null) { return; }
+        var confirmed = await confirmModal.Confirm(
+            ConfirmType.Warm.Create("再起動確認", "このサーバーを再起動しますか？", "再起動する", "キャンセル")
+        );
+        if (!confirmed) { return; }
+        await Restart();
+    }
+
+    /// <summary>
+    /// 予約シャットダウンの確認モーダルを表示し、承認された場合に予約を登録する
+    /// </summary>
+    private async Task ConfirmRegisterScheduleShutdown()
+    {
+        if (confirmModal is null) { return; }
+        var executeAt = DateTimeOffset.Now.AddHours(2);
+        var confirmed = await confirmModal.Confirm(
+            ConfirmType.Info.Create("予約シャットダウン確認", $"2時間後 ({executeAt:HH:mm}) にシャットダウンを予約しますか？", "予約する", "キャンセル")
+        );
+        if (!confirmed) { return; }
+        await RegisterScheduleShutdown(executeAt);
+    }
+
+    /// <summary>
     /// シャットダウン
     /// </summary>
     private async Task Shutdown()
@@ -121,6 +169,7 @@
     /// <summary>
     /// シャットダウンを予約する
     /// </summary>
+    /// <param name="executeAt">シャットダウン実行日時</param>
     private async Task RegisterScheduleShutdown(DateTimeOffset executeAt)
     {
         if (PowerHubClient is null) { return; }
