@@ -108,8 +108,11 @@ await InvokeAsync(StateHasChanged);
 `closedby="none"` はバックドロップクリックと ESC によるダイアログ閉鎖を禁止する HTML 属性だが、
 **Firefox は未対応**であり `InvalidCharacterError` が発生する。
 
-現在の `Locked=true` 時の実装:
-- `closedby` 属性を出力しない（`null` を渡すと Blazor が属性ごと省略する）
+現在の実装:
+- `closedby` 属性を **完全に省略**（`Locked` の値に関わらず出力しない）
 - ESC 防止は `@oncancel:preventDefault="Locked"` で代替
+- バックドロップクリックによる閉鎖は Chrome・Firefox ともに無効
 
-Firefox が `closedby` をサポートした時点で `Modal.razor` の `null` を `"none"` に変更すること。
+Firefox が `closedby` をサポートした時点で `Modal.razor` に以下を復活させること:
+- `Locked=false` 時: `closedby="any"`（バックドロップクリックで閉じる）
+- `Locked=true` 時: `closedby="none"`（ユーザー操作で閉じない）

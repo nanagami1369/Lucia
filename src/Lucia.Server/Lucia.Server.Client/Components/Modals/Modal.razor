@@ -3,10 +3,12 @@
 @implements IModalContext
 @rendermode InteractiveWebAssembly
 
-@* TODO(2026-03-15): Locked=true 時は closedby="none" を設定すべきだが、Firefox が closedby 属性未対応のため
-         InvalidCharacterError が発生する。Firefox が closedby をサポートした時点で
-         null を "none" に変更すること。ESC 防止は暫定的に @oncancel:preventDefault で対処。 *@
-<dialog class="dialog" closedby="@(Locked ? null : "any")" @ref="dialogElement" @oncancel="HandleCancel"
+@* TODO(2026-03-15): closedby 属性は Firefox 未対応のため全面的に省略している。
+         本来は Locked=false 時に closedby="any"（バックドロップクリックで閉じる）、
+         Locked=true 時に closedby="none"（ユーザー操作で閉じない）を設定すべき。
+         Firefox が closedby をサポートした時点で属性を復活させること。
+         ESC 防止は暫定的に @oncancel:preventDefault で対処。 *@
+<dialog class="dialog" @ref="dialogElement" @oncancel="HandleCancel"
         @oncancel:preventDefault="Locked" @onclose="HandleClose">
     @ChildContent?.Invoke(this)
 </dialog>
