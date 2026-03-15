@@ -66,19 +66,6 @@ src/
 
 ## アーキテクチャ
 
-```mermaid
-flowchart TD
-    A[Razor コンポーネント] -->|SignalR| B[Hub クライアント\nSessionHubClient / PowerHubClient]
-    B -->|Hub メソッド呼び出し| C[サーバー Hub\nSessionHub / PowerHub]
-    C -->|DI| D[サービス層\nSessionService / PowerService]
-    D -->|Windows API| E[Windows OS\nCassia: RDP セッション\nProcessX: 電源コマンド]
-
-    F[FetchWorker\n5秒ポーリング] -->|SignalR ブロードキャスト| A
-    F --> D
-```
-
-**データフロー（テキスト版）**
-
 ```
 Razor コンポーネント
   ↓ (SignalR)
