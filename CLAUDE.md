@@ -68,6 +68,26 @@ Windows OS (Cassia で RDP セッション / ProcessX で電源コマンド)
 
 すべてのサービスは `StatsLogger` を通じてログを記録し、本番環境では Windows イベントログに出力される。
 
+## デプロイ（再発行）
+
+ユーザーから「再発行」「デプロイ」「redeploy」などを依頼された場合、以下のスクリプトを実行すること。
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\redeploy.ps1
+```
+
+**スクリプトの動作フロー:**
+1. 管理者権限への昇格（UAC ダイアログが表示される → ユーザーが承認）
+2. `LuciaServer` サービスの存在確認
+   - 存在する場合: `Installer.ps1 -Action uninstall` でサービス停止・削除
+   - 存在しない場合: 新規インストールとして続行
+3. `dotnet publish` で `publish/Lucia/` に発行
+4. `Installer.ps1 -Action install` でサービス登録・起動
+
+**注意:**
+- Installer.ps1 の各アクション完了後に `Read-Host` で一時停止する。そのままユーザーが Enter キーを押すと次のステップへ進む。
+- スクリプトは `scripts/redeploy.ps1` にある。内部で `publish/Lucia/Installer.ps1` を呼び出す。
+
 ## コーディングルール
 
 ・メソッド名、変数名はリーダブルコードを参考にすること
