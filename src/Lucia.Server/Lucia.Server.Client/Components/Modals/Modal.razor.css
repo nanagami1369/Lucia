@@ -4,10 +4,14 @@
     border-radius: var(--radius-lg);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
     padding: var(--space-6);
-    width: min(480px, 100% - var(--space-8));
+    width: min(480px, calc(100% - var(--space-8)));
     max-height: 90dvh;
     overflow-y: auto;
-    margin: auto;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    margin: 0;
     opacity: 0;
     transition:
         display var(--transition-duration) allow-discrete,
@@ -27,11 +31,11 @@
 
 @keyframes dialog-slide-up {
     from {
-        transform: translateY(16px) scale(0.97);
+        transform: translateX(-50%) translateY(calc(-50% + 16px)) scale(0.97);
     }
 
     to {
-        transform: translateY(0) scale(1);
+        transform: translateX(-50%) translateY(-50%) scale(1);
     }
 }
 
