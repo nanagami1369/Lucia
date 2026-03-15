@@ -14,10 +14,12 @@ namespace Lucia.Server;
 
 public class Program {
     public static void Main(string[] args) {
-        var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateBuilder(new WebApplicationOptions {
+            Args = args,
+            ContentRootPath = AppContext.BaseDirectory,
+        });
 
         builder.Host.UseWindowsService();
-        builder.WebHost.UseContentRoot(AppContext.BaseDirectory);
 
         // ロガー追加
         builder.Services.AddTransient(typeof(StatsLogger<>));
