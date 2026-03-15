@@ -19,6 +19,12 @@ dotnet run --project src/Lucia.Server/Lucia.Server/Lucia.Server.csproj
 
 # リリースビルド
 dotnet build --configuration Release
+
+# リリースビルド＆発行（Windows Service 用）
+# publish/Lucia フォルダに出力される
+# .NET 10 では MapStaticAssets() の仕様により dotnet build では wwwroot が生成されないため、
+# Windows Service として運用する場合は必ずこのコマンドで発行すること
+dotnet publish src/Lucia.Server/Lucia.Server/Lucia.Server.csproj --configuration Release --runtime win-x64 --self-contained false --output ./publish/Lucia
 ```
 
 ## アーキテクチャ
