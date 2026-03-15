@@ -141,6 +141,10 @@ dotnet publish src/Lucia.Server/Lucia.Server/Lucia.Server.csproj \
 
 インストール後はブラウザで `http://<サーバーIP>:6100` にアクセスします。
 
+## ライセンス
+
+[MIT License](LICENSE)
+
 ### 開発中の動作検証（再デプロイ）
 
 開発中に素早く動作確認したい場合は、以下のスクリプトで発行からサービス再起動までを一括実行できます。
