@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{
 		Documents\design-tokens-demo.html = Documents\design-tokens-demo.html
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuciaServer.Shared", "LuciaServer.Shared\LuciaServer.Shared.csproj", "{032D1318-0EB9-4C74-AE66-72E6F20DCEB5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuciaServer.Shared", "src\LuciaServer.Shared\LuciaServer.Shared.csproj", "{032D1318-0EB9-4C74-AE66-72E6F20DCEB5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューション項目", "ソリューション項目", "{FC1F2DFE-1DAD-4BBF-A075-B21036982D12}"
 	ProjectSection(SolutionItems) = preProject
