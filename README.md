@@ -2,8 +2,6 @@
 
 Windows RDSホスト 管理ダッシュボード。RDP セッション管理とサーバー電源操作をブラウザから行える Blazor フルスタック Web アプリケーションです。
 
-## スクリーンショット
-
 ![Luciaダッシュボード](https://raw.githubusercontent.com/nanagami1369/Lucia/main/docs/screenshot.png)
 
 ## ⚠️ 注意事項
