@@ -88,6 +88,15 @@ public class HubConnectionStatusService : IDisposable {
     };
 
     /// <summary>
+    /// 全HubClientの接続を開始します
+    /// </summary>
+    public async Task StartAllAsync() {
+        foreach (var client in _clientStates.Keys) {
+            await client.Start();
+        }
+    }
+
+    /// <summary>
     /// 破棄処理：各HubClientのイベント購読を解除します
     /// </summary>
     public void Dispose() {

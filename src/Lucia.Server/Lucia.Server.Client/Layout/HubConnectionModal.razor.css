@@ -101,3 +101,21 @@
     line-height: var(--line-height-relaxed);
     font-size: var(--font-size-base);
 }
+
+/* ===== 再接続アクション ===== */
+
+.hub-reconnect-action {
+    padding: var(--space-2) var(--space-6);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-inverse);
+    background-color: var(--color-accent);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: opacity var(--transition-duration) var(--transition-timing);
+}
+
+.hub-reconnect-action:hover {
+    opacity: 0.85;
+}

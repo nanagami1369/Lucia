@@ -9,7 +9,8 @@
             <div class="hub-status is-disconnected">
                 <span class="hub-status-icon" aria-hidden="true">⚠</span>
                 <h2 class="hub-status-title">接続が切断されました</h2>
-                <p class="hub-status-message">サーバーへの接続が失われました。<br />自動で再接続を試みています。</p>
+                <p class="hub-status-message">サーバーへの接続が失われました。</p>
+                <button class="hub-reconnect-action" @onclick="ReconnectAsync">再接続</button>
             </div>
         } else if (currentState == HubClientState.Reconnecting) {
             <div class="hub-status is-reconnecting">
@@ -78,6 +79,14 @@
         } else {
             await modal.Open();
         }
+    }
+
+    /// <summary>
+    /// 再接続ボタン押下ハンドラー
+    /// </summary>
+    private async Task ReconnectAsync() {
+        if (statusService == null) { return; }
+        await statusService.StartAllAsync();
     }
 
     /// <summary>
