@@ -185,6 +185,10 @@ DocProject/Help/html
 # Click-Once directory
 publish/
 
+# Lucia.Installer ビルド成果物（Release 時に自動生成される）
+src/Lucia.Installer/app-publish/
+src/Lucia.Installer/app-bundle.zip
+
 # Publish Web Output
 *.[Pp]ublish.xml
 *.azurePubxml
