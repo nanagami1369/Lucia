@@ -42,7 +42,10 @@ public abstract class HubClient : IAsyncDisposable {
                     TimeSpan.FromSeconds(30),
                     TimeSpan.FromMinutes(1),
                     TimeSpan.FromMinutes(2),
-                    TimeSpan.FromMinutes(5),
+                    TimeSpan.FromMinutes(2),
+                    TimeSpan.FromMinutes(2),
+                    TimeSpan.FromMinutes(2),
+                    TimeSpan.FromMinutes(2)
                     ])
             .Build();
 
