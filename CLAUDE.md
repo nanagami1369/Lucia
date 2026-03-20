@@ -36,7 +36,7 @@ dotnet publish src/Lucia.Server/Lucia.Server/Lucia.Server.csproj --configuration
 | `Lucia.Server` | ASP.NET Core ホスト、SignalR Hub、バックグラウンドサービス |
 | `Lucia.Server.Client` | Blazor WebAssembly クライアント UI、Hub クライアント |
 | `Lucia.Services` | ビジネスロジック（セッション・電源・タイマー管理） |
-| `Lucia.Models` | ドメインモデル（`SessionInfo`、`SessionState` 等） |
+| `Lucia.Models` | ドメインモデルと業務例外 |
 | `LuciaServer.Shared` | Hub インターフェース（`ISessionHub`、`IPowerHub` 等） |
 
 ### データフロー
@@ -68,25 +68,15 @@ Windows OS (Cassia で RDP セッション / ProcessX で電源コマンド)
 
 すべてのサービスは `StatsLogger` を通じてログを記録し、本番環境では Windows イベントログに出力される。
 
-## デプロイ（再発行）
+## Lucia.Installer のビルド設計原則
 
-ユーザーから「再発行」「デプロイ」「redeploy」などを依頼された場合、以下のスクリプトを実行すること。
+**`dotnet publish Lucia.Installer --configuration Release` 単体で完結すること。**
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\redeploy.ps1
-```
-
-**スクリプトの動作フロー:**
-1. 管理者権限への昇格（UAC ダイアログが表示される → ユーザーが承認）
-2. `LuciaServer` サービスの存在確認
-   - 存在する場合: `Installer.ps1 -Action uninstall` でサービス停止・削除
-   - 存在しない場合: 新規インストールとして続行
-3. `dotnet publish` で `publish/Lucia/` に発行
-4. `Installer.ps1 -Action install` でサービス登録・起動
-
-**注意:**
-- Installer.ps1 の各アクション完了後に `Read-Host` で一時停止する。そのままユーザーが Enter キーを押すと次のステップへ進む。
-- スクリプトは `scripts/redeploy.ps1` にある。内部で `publish/Lucia/Installer.ps1` を呼び出す。
+- Lucia.Installer は一般ユーザーが配布された `.exe` を実行してインストールする。
+- インストーラーのビルドが `redeploy.ps1` などの開発者スクリプトの事前実行を前提にしてはならない。
+- `redeploy.ps1` は開発者が AI を経由して変更を継続的に検証するための補助スクリプトであり、一般ユーザーには関係しない。
+- Lucia.Server のビルド・zip 化・EmbeddedResource への埋め込みはすべて `Lucia.Installer.csproj` の `BuildServerBundle` MSBuild Target に実装し、`BeforeTargets="CoreCompile"` で自動実行されるようにする。
+- `redeploy.ps1` はビルドを呼び出すだけでよく、zip 生成や2フェーズ管理を PowerShell 側に持ち込んではならない。
 
 ## コーディングルール
 
