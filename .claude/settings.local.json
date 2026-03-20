@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pwsh -ExecutionPolicy Bypass -File .claude/skills/lucia-deploy/scripts/deploy.ps1 2>&1)",
+      "Bash(pwsh -NoProfile -Command \"Get-Content 'logs/lucia-deploy.log' -Encoding UTF8\")"
+    ]
+  }
+}
