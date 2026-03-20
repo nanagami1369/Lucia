@@ -20,11 +20,10 @@ dotnet run --project src/Lucia.Server/Lucia.Server/Lucia.Server.csproj
 # リリースビルド
 dotnet build --configuration Release
 
-# リリースビルド＆発行（Windows Service 用）
-# publish/Lucia フォルダに出力される
-# .NET 10 では MapStaticAssets() の仕様により dotnet build では wwwroot が生成されないため、
-# Windows Service として運用する場合は必ずこのコマンドで発行すること
-dotnet publish src/Lucia.Server/Lucia.Server/Lucia.Server.csproj --configuration Release --runtime win-x64 --self-contained false --output ./publish/Lucia
+# インストーラーのビルド＆発行（Windows Service 用）
+# publish/Lucia.Installer フォルダに出力される
+# 内部で Lucia.Server のビルド・zip 化・同梱まで自動実行される
+dotnet publish src/Lucia.Installer/Lucia.Installer.csproj --configuration Release --output ./publish/Lucia.Installer
 ```
 
 ## アーキテクチャ
@@ -73,10 +72,7 @@ Windows OS (Cassia で RDP セッション / ProcessX で電源コマンド)
 **`dotnet publish Lucia.Installer --configuration Release` 単体で完結すること。**
 
 - Lucia.Installer は一般ユーザーが配布された `.exe` を実行してインストールする。
-- インストーラーのビルドが `redeploy.ps1` などの開発者スクリプトの事前実行を前提にしてはならない。
-- `redeploy.ps1` は開発者が AI を経由して変更を継続的に検証するための補助スクリプトであり、一般ユーザーには関係しない。
 - Lucia.Server のビルド・zip 化・EmbeddedResource への埋め込みはすべて `Lucia.Installer.csproj` の `BuildServerBundle` MSBuild Target に実装し、`BeforeTargets="CoreCompile"` で自動実行されるようにする。
-- `redeploy.ps1` はビルドを呼び出すだけでよく、zip 生成や2フェーズ管理を PowerShell 側に持ち込んではならない。
 
 ## コーディングルール
 

@@ -104,41 +104,15 @@ dotnet run --project src/Lucia.Server/Lucia.Server/Lucia.Server.csproj
 
 ## デプロイ（Windows Service）
 
-### 発行
-
-```bash
-dotnet publish src/Lucia.Server/Lucia.Server/Lucia.Server.csproj \
-  --configuration Release \
-  --runtime win-x64 \
-  --self-contained false \
-  --output ./publish/Lucia
-```
-
-> **注意**: .NET 10 では `MapStaticAssets()` の仕様により `dotnet build` では `wwwroot` が生成されません。Windows Service として運用する場合は必ず `dotnet publish` で発行してください。
-
 ### インストール
 
-発行後、`publish/Lucia/` に出力された `Installer.ps1` を管理者権限で実行します。
+`Lucia.Installer.csproj` を発行します。内部で Lucia.Server のビルド・同梱まで自動実行されます。
 
-```powershell
-# サービスのインストールと起動（ポート 6100 で起動、ファイアウォール開放）
-.\publish\Lucia\Installer.ps1 -Action install
-
-# サービスの停止とアンインストール
-.\publish\Lucia\Installer.ps1 -Action uninstall
+```bash
+dotnet publish src/Lucia.Installer/Lucia.Installer.csproj --configuration Release --output ./publish/Lucia.Installer
 ```
 
-インストール後はブラウザで `http://<サーバーIP>:6100` にアクセスします。
-
-### 開発中の動作検証（再デプロイ）
-
-開発中に素早く動作確認したい場合は、以下のスクリプトで発行からサービス再起動までを一括実行できます。
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\redeploy.ps1
-```
-
-既存の `LuciaServer` サービスをアンインストールし、`dotnet publish` 後に再インストールまで自動で行います。UAC ダイアログが表示されるので管理者権限で承認してください。
+発行後、`publish/Lucia.Installer/Lucia.Installer.exe` を実行してインストールします（UAC ダイアログが表示されます）。
 
 ## ライセンス
 

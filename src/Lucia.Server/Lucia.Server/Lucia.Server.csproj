@@ -20,10 +20,4 @@
       <ProjectReference Include="..\Lucia.Server.Client\Lucia.Server.Client.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Update="Installer.ps1">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
 </Project>
