@@ -1,3 +1,8 @@
+---
+tags: powershell,windows,uac,security
+updated: 2026-03-20 13:04:20
+---
+
 # PowerShell UAC 昇格パターン
 
 ## ログファイル経由の昇格パターン

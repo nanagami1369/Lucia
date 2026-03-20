@@ -1,3 +1,8 @@
+---
+tags: powershell,windows,testing
+updated: 2026-03-20 13:04:20
+---
+
 # PowerShell Tips
 
 ## 文字コード：pwsh vs powershell

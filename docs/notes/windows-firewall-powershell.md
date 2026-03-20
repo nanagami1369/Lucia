@@ -1,3 +1,8 @@
+---
+tags: powershell,windows,firewall,network
+updated: 2026-03-20 13:04:20
+---
+
 # Windows Firewall と PowerShell
 
 ## ファイアウォールルールの検索

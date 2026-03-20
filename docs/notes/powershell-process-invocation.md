@@ -1,3 +1,8 @@
+---
+tags: powershell,windows
+updated: 2026-03-20 13:04:20
+---
+
 # PowerShell プロセス起動・引数渡し
 
 ## スペースを含むパスの引数渡し

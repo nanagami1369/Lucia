@@ -74,6 +74,19 @@ Windows OS (Cassia で RDP セッション / ProcessX で電源コマンド)
 - Lucia.Installer は一般ユーザーが配布された `.exe` を実行してインストールする。
 - Lucia.Server のビルド・zip 化・EmbeddedResource への埋め込みはすべて `Lucia.Installer.csproj` の `BuildServerBundle` MSBuild Target に実装し、`BeforeTargets="CoreCompile"` で自動実行されるようにする。
 
+## docs/notes への知見の記録
+
+- `docs/notes/` に技術的な知見を積極的に書き込む。書き込む前に許可を求めない。
+- プロジェクト固有の名称（サービス名・クラス名・パス等）は使わず、他プロジェクトでも再利用できる汎用的な表現にする。
+- 各ノートの frontmatter は以下のフォーマットとする：
+
+```markdown
+---
+tags: blazor,c#,wasm   # トピックを表すタグをカンマ区切りで列挙
+updated: 2026-03-20 13:04:20  # 作成・更新日時
+---
+```
+
 ## コーディングルール
 
 - メソッド名、変数名はリーダブルコードを参考にすること
