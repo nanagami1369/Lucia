@@ -39,9 +39,7 @@
     <Message Text="[Lucia.Installer] Lucia.Server をビルドしてバンドルを生成しています..." Importance="high" />
     <RemoveDir Directories="$(AppPublishDir)" />
     <Delete Files="$(AppBundleZip)" Condition="Exists('$(AppBundleZip)')" />
-    <MSBuild Projects="$(ServerProject)"
-             Targets="Restore;Publish"
-             Properties="Configuration=Release;RuntimeIdentifier=win-x64;SelfContained=false;PublishDir=$(AppPublishDir)" />
+    <Exec Command="dotnet publish &quot;$(ServerProject)&quot; --configuration Release --runtime win-x64 --no-self-contained --output &quot;$(AppPublishDir)&quot;" />
     <ZipDirectory SourceDirectory="$(AppPublishDir)" DestinationFile="$(AppBundleZip)" Overwrite="true" />
     <Message Text="[Lucia.Installer] バンドル生成完了: $(AppBundleZip)" Importance="high" />
   </Target>
