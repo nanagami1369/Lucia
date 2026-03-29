@@ -48,7 +48,6 @@ jobs:
           files: |
             publish/Lucia.Installer/Lucia.Installer.exe
             publish/Lucia.Installer/Lucia.Installer.exe.sha256
-          body_prefix: |
+          append_body: true
+          body: |
             インストール方法は [ユーザーガイド](https://github.com/nanagami1369/Lucia/blob/main/docs/USER_GUIDE.md) を参照してください。
-
-            ---
