@@ -12,9 +12,9 @@
         <Control Id="Title"        Type="Text"   X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.ConfigDlgTitle)" />
         <Control Id="Description"  Type="Text"   X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.ConfigDlgDescription)" />
 
-        <!-- ポート番号 -->
+        <!-- ポート番号（最大5桁: 1〜65535） -->
         <Control Id="PortLabel" Type="Text"    X="25" Y="70" Width="120" Height="12" TabSkip="yes" Text="!(loc.ConfigDlgPortLabel)" />
-        <Control Id="PortEdit"  Type="Edit"    X="25" Y="84" Width="100" Height="16" Property="PORT" Text="{4}" />
+        <Control Id="PortEdit"  Type="Edit"    X="25" Y="84" Width="100" Height="16" Property="PORT" Text="{5}" />
 
         <!-- 許可サブネット -->
         <Control Id="SubnetLabel" Type="Text" X="25" Y="115" Width="200" Height="12" TabSkip="yes" Text="!(loc.ConfigDlgSubnetLabel)" />
@@ -23,12 +23,28 @@
         <!-- 区切り線・ボタン -->
         <Control Id="BottomLine" Type="Line"   X="0"   Y="234" Width="370" Height="0" TabSkip="yes" />
         <Control Id="Back"       Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
-        <Control Id="Next"       Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
+        <Control Id="Next"       Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
+          <!-- C# カスタムアクションでポート番号・CIDR を検証し CONFIG_VALID と VALIDATION_ERROR_MSG をセット -->
+          <Publish Event="DoAction" Value="ValidateConfig" />
+          <!-- バリデーション失敗時はエラーダイアログを表示して遷移をブロック -->
+          <Publish Event="SpawnDialog" Value="ValidationErrorDlg" Condition="CONFIG_VALID = &quot;0&quot;" />
+          <!-- バリデーション通過時のみ次の画面へ進む -->
+          <Publish Event="NewDialog" Value="VerifyReadyDlg" Condition="CONFIG_VALID = &quot;1&quot;" />
+        </Control>
         <Control Id="Cancel"     Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
           <Publish Event="SpawnDialog" Value="CancelDlg" />
         </Control>
 
       </Dialog>
+
+      <!-- 入力バリデーションエラー通知ダイアログ -->
+      <Dialog Id="ValidationErrorDlg" Width="260" Height="85" Title="!(loc.ValidationErrorDlgTitle)" NoMinimize="yes">
+        <Control Id="ErrorMessage" Type="Text"       X="15" Y="15" Width="230" Height="40" TabSkip="yes" Text="[VALIDATION_ERROR_MSG]" />
+        <Control Id="ErrorOK"      Type="PushButton" X="102" Y="57" Width="56"  Height="17" Default="yes" Cancel="yes" Text="OK">
+          <Publish Event="EndDialog" Value="Return" />
+        </Control>
+      </Dialog>
+
     </UI>
   </Fragment>
 

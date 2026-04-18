@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>Lucia.WixInstaller.CustomActions</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Dtf.WindowsInstaller" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Dtf.CustomAction" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- MakeSfxCA がこのファイルを CA パッケージに埋め込む。net4 で CLR ロードに必要 -->
+    <Content Include="CustomAction.config" />
+  </ItemGroup>
+
+  <!-- x64 MSI に合わせて CA DLL を x64 スタブでビルドする -->
+  <Target Name="SetX64SfxCA" BeforeTargets="PackCustomAction">
+    <PropertyGroup>
+      <SfxCADll>$(MakeSfxCAPath)x64\SfxCA.dll</SfxCADll>
+    </PropertyGroup>
+  </Target>
+
+</Project>

@@ -240,6 +240,7 @@ function Assert-FirewallRuleSubnet([string]$expectedSubnet, [string]$description
     Write-Info "FW RemoteAddress (actual): $actual"
 
     # Windows Firewall は CIDR (/16) をドット表記 (/255.255.0.0) で保存するため両形式を検証
+    # 0.0.0.0/0 は "Any" に変換されるため特別扱いする
     $matchesDirect = $actual -like "*$expectedSubnet*"
     $matchesDotted = $false
     if ($expectedSubnet -match '^(.+)/(\d+)$') {
@@ -247,7 +248,8 @@ function Assert-FirewallRuleSubnet([string]$expectedSubnet, [string]$description
         $dottedMask    = ConvertTo-DottedMask ([int]$Matches[2])
         $matchesDotted = $actual -like "*$networkAddr/$dottedMask*"
     }
-    return Assert-True ($matchesDirect -or $matchesDotted) $desc
+    $matchesAny = ($expectedSubnet -eq '0.0.0.0/0' -and $actual -like '*Any*')
+    return Assert-True ($matchesDirect -or $matchesDotted -or $matchesAny) $desc
 }
 
 function Assert-FirewallRuleNotExists([string]$description = 'FW 規則が存在しない') {
@@ -510,6 +512,89 @@ Run-Test '08' 'install → uninstall → install（連続操作）' {
     Assert-ServiceRunning '2回目の install 後にサービスが Running 状態である'
     Assert-FirewallRuleExists $DefaultPort
     Assert-FilesExist $DefaultInstallPath
+
+    Ensure-Clean
+}
+
+Run-Test '09' '不正ポート（0）は 1603 で失敗する' {
+    Ensure-Clean
+
+    $exitCode = Invoke-MsiInstall @{ PORT = '0' }
+
+    Assert-ExitCode $exitCode @(1603) '不正ポート 0 のインストールが 1603 で失敗する'
+    Assert-ServiceNotExists 'インストール失敗後にサービスが存在しない'
+    Assert-FirewallRuleNotExists 'インストール失敗後に FW 規則が存在しない'
+}
+
+Run-Test '10' '不正ポート（65536）は 1603 で失敗する' {
+    Ensure-Clean
+
+    $exitCode = Invoke-MsiInstall @{ PORT = '65536' }
+
+    Assert-ExitCode $exitCode @(1603) '不正ポート 65536 のインストールが 1603 で失敗する'
+    Assert-ServiceNotExists 'インストール失敗後にサービスが存在しない'
+}
+
+Run-Test '11' '不正ポート（非数値）は 1603 で失敗する' {
+    Ensure-Clean
+
+    $exitCode = Invoke-MsiInstall @{ PORT = 'abc' }
+
+    Assert-ExitCode $exitCode @(1603) '不正ポート "abc" のインストールが 1603 で失敗する'
+    Assert-ServiceNotExists 'インストール失敗後にサービスが存在しない'
+}
+
+Run-Test '12' '不正 CIDR（スラッシュなし）は 1603 で失敗する' {
+    Ensure-Clean
+
+    $exitCode = Invoke-MsiInstall @{ ALLOWED_SUBNET = '192.168.0.0' }
+
+    Assert-ExitCode $exitCode @(1603) '不正 CIDR "192.168.0.0" のインストールが 1603 で失敗する'
+    Assert-ServiceNotExists 'インストール失敗後にサービスが存在しない'
+    Assert-FirewallRuleNotExists 'インストール失敗後に FW 規則が存在しない（全 IP 開放にならない）'
+}
+
+Run-Test '13' '不正 CIDR（プレフィックス超過）は 1603 で失敗する' {
+    Ensure-Clean
+
+    $exitCode = Invoke-MsiInstall @{ ALLOWED_SUBNET = '192.168.0.0/33' }
+
+    Assert-ExitCode $exitCode @(1603) '不正 CIDR "192.168.0.0/33" のインストールが 1603 で失敗する'
+    Assert-ServiceNotExists 'インストール失敗後にサービスが存在しない'
+}
+
+Run-Test '14' '境界値ポート 1 で正常インストール' {
+    Ensure-Clean
+
+    $exitCode = Invoke-MsiInstall @{ PORT = '1' }
+
+    Assert-ExitCode $exitCode
+    Assert-ServiceRunning
+    Assert-FirewallRuleExists 1 'FW 規則がポート 1 で存在する'
+
+    Ensure-Clean
+}
+
+Run-Test '15' '境界値ポート 65535 で正常インストール' {
+    Ensure-Clean
+
+    $exitCode = Invoke-MsiInstall @{ PORT = '65535' }
+
+    Assert-ExitCode $exitCode
+    Assert-ServiceRunning
+    Assert-FirewallRuleExists 65535 'FW 規則がポート 65535 で存在する'
+
+    Ensure-Clean
+}
+
+Run-Test '16' '境界値サブネット 0.0.0.0/0（全許可）で正常インストール' {
+    Ensure-Clean
+
+    $exitCode = Invoke-MsiInstall @{ ALLOWED_SUBNET = '0.0.0.0/0' }
+
+    Assert-ExitCode $exitCode
+    Assert-ServiceRunning
+    Assert-FirewallRuleSubnet '0.0.0.0/0' 'FW 規則のリモートIPが 0.0.0.0/0 である'
 
     Ensure-Clean
 }

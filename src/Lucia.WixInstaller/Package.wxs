@@ -95,6 +95,30 @@
     <!-- MIT ライセンス表示 -->
     <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
 
+    <!-- バリデーション カスタムアクション -->
+    <Binary Id="CustomActionsDll" SourceFile="$(var.CustomActionsDll)" />
+
+    <!--
+      即時フェーズで実行: UI シーケンス中（ダイアログの DoAction イベント）から呼び出す。
+      ポート番号と CIDR 形式を検証し、結果を CONFIG_VALID プロパティにセットする。
+    -->
+    <CustomAction Id="ValidateConfig"
+                  BinaryRef="CustomActionsDll"
+                  DllEntry="ValidateConfig"
+                  Execute="immediate"
+                  Return="check" />
+
+    <!--
+      InstallExecuteSequence 用バリデーション。
+      /qn（サイレント）インストール時に UI なしで不正なプロパティが渡された場合に備え、
+      失敗時は ActionResult.Failure を返してインストールを中断する。
+    -->
+    <CustomAction Id="ValidateConfigExecute"
+                  BinaryRef="CustomActionsDll"
+                  DllEntry="ValidateConfigExecute"
+                  Execute="immediate"
+                  Return="check" />
+
     <!--
       WiX Firewall 拡張が RemoteAddresses 未サポートのため、
       netsh で ALLOWED_SUBNET を反映するカスタムアクションを追加する。
@@ -163,6 +187,9 @@
                   Return="ignore" />
 
     <InstallExecuteSequence>
+      <!-- プロパティバリデーション: インストール・アップグレード時のみ実行（アンインストール時はスキップ） -->
+      <Custom Action="ValidateConfigExecute" Before="InstallFiles"
+              Condition="NOT REMOVE" />
       <!-- ファイアウォール規則追加後にサブネットを更新する（インストール・アップグレード時） -->
       <Custom Action="UpdateFirewallSubnet" Before="InstallFinalize"
               Condition="NOT Installed OR REINSTALL" />

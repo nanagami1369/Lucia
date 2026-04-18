@@ -38,6 +38,9 @@
   <String Id="ConfigDlgPortLabel" Value="ポート番号:" />
   <String Id="ConfigDlgSubnetLabel" Value="許可サブネット (CIDR 表記):" />
 
+  <!-- ValidationErrorDlg: 入力バリデーションエラー -->
+  <String Id="ValidationErrorDlgTitle" Value="入力エラー" />
+
   <!-- 標準ボタンラベル -->
   <String Id="WixUIBack" Value="戻る(&amp;B)" />
   <String Id="WixUINext" Value="次へ(&amp;N)" />
