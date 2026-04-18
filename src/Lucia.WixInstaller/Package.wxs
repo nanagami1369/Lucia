@@ -113,10 +113,63 @@
                   Impersonate="no"
                   Return="ignore" />
 
+    <!--
+      WiX Firewall CA がアンインストール時に FW ルールを削除できない（action state 0）ため、
+      netsh で明示的に削除するカスタムアクションを追加する。
+      REMOVE="ALL" のとき（完全アンインストール・MajorUpgrade での旧バージョン除去）に実行する。
+    -->
+    <SetProperty Id="RemoveFirewallRule"
+                 Value='netsh advfirewall firewall delete rule name="LuciaServer"'
+                 Before="RemoveFirewallRule"
+                 Sequence="execute" />
+
+    <CustomAction Id="RemoveFirewallRule"
+                  Directory="SystemFolder"
+                  ExeCommand="[RemoveFirewallRule]"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+
+    <!--
+      WiX util:EventSource CA もアンインストール時に action state 0 で削除できないため、
+      reg コマンドで Application イベントログのソースキーを明示削除する。
+    -->
+    <SetProperty Id="RemoveEventLogSource"
+                 Value='reg delete "HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Application\LuciaServer" /f'
+                 Before="RemoveEventLogSource"
+                 Sequence="execute" />
+
+    <CustomAction Id="RemoveEventLogSource"
+                  Directory="SystemFolder"
+                  ExeCommand="[RemoveEventLogSource]"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+
+    <!--
+      WiX ServiceControl の DeleteService はアンインストール後も SCM エントリが
+      残ることがある。sc.exe で明示削除して確実にクリーンアップする。
+    -->
+    <SetProperty Id="DeleteService"
+                 Value='sc.exe delete LuciaServer'
+                 Before="DeleteService"
+                 Sequence="execute" />
+
+    <CustomAction Id="DeleteService"
+                  Directory="SystemFolder"
+                  ExeCommand="[DeleteService]"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+
     <InstallExecuteSequence>
       <!-- ファイアウォール規則追加後にサブネットを更新する（インストール・アップグレード時） -->
       <Custom Action="UpdateFirewallSubnet" Before="InstallFinalize"
               Condition="NOT Installed OR REINSTALL" />
+      <!-- アンインストール時に FW ルール・EventLog ソース・サービスを明示削除する -->
+      <Custom Action="RemoveFirewallRule"    Before="InstallFinalize" Condition='REMOVE = "ALL"' />
+      <Custom Action="RemoveEventLogSource"  Before="InstallFinalize" Condition='REMOVE = "ALL"' />
+      <Custom Action="DeleteService"         Before="InstallFinalize" Condition='REMOVE = "ALL"' />
     </InstallExecuteSequence>
 
   </Package>
