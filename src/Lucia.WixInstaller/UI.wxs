@@ -2,11 +2,33 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 
   <Fragment>
-    <!-- WixUI 標準フォントを Meiryo UI にオーバーライド -->
     <UI>
-      <TextStyle Id="WixUI_Font_Normal" FaceName="Meiryo UI" Size="9" />
-      <TextStyle Id="WixUI_Font_Bigger" FaceName="Meiryo UI" Size="12" Bold="yes" />
-      <TextStyle Id="WixUI_Font_Title"  FaceName="Meiryo UI" Size="12" Bold="yes" />
+      <!-- ポート番号と許可サブネットを設定するカスタムダイアログ -->
+      <Dialog Id="ConfigDlg" Width="370" Height="270" Title="!(loc.ConfigDlgTitle)">
+
+        <!-- タイトルバナー -->
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="yes" Text="WixUI_Bmp_Banner" />
+        <Control Id="BannerLine"   Type="Line"   X="0" Y="44" Width="370" Height="0" TabSkip="yes" />
+        <Control Id="Title"        Type="Text"   X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.ConfigDlgTitle)" />
+        <Control Id="Description"  Type="Text"   X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.ConfigDlgDescription)" />
+
+        <!-- ポート番号 -->
+        <Control Id="PortLabel" Type="Text"    X="25" Y="70" Width="120" Height="12" TabSkip="yes" Text="!(loc.ConfigDlgPortLabel)" />
+        <Control Id="PortEdit"  Type="Edit"    X="25" Y="84" Width="100" Height="16" Property="PORT" Text="{4}" />
+
+        <!-- 許可サブネット -->
+        <Control Id="SubnetLabel" Type="Text" X="25" Y="115" Width="200" Height="12" TabSkip="yes" Text="!(loc.ConfigDlgSubnetLabel)" />
+        <Control Id="SubnetEdit"  Type="Edit" X="25" Y="129" Width="200" Height="16" Property="ALLOWED_SUBNET" Text="{64}" />
+
+        <!-- 区切り線・ボタン -->
+        <Control Id="BottomLine" Type="Line"   X="0"   Y="234" Width="370" Height="0" TabSkip="yes" />
+        <Control Id="Back"       Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+        <Control Id="Next"       Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
+        <Control Id="Cancel"     Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+
+      </Dialog>
     </UI>
   </Fragment>
 

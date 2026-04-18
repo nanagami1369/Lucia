@@ -32,6 +32,12 @@
   <String Id="MaintenanceTypeDlgRepairText" Value="インストールエラーを修復します。欠落ファイルの修正、ショートカットの修正、レジストリエントリの修正を行います。" />
   <String Id="MaintenanceTypeDlgRemoveText" Value="コンピューターから Lucia を削除します。" />
 
+  <!-- ConfigDlg: ポート・サブネット設定画面 -->
+  <String Id="ConfigDlgTitle" Value="{\WixUI_Font_Title}接続設定" />
+  <String Id="ConfigDlgDescription" Value="ポート番号と許可サブネットを設定してください。" />
+  <String Id="ConfigDlgPortLabel" Value="ポート番号:" />
+  <String Id="ConfigDlgSubnetLabel" Value="許可サブネット (CIDR 表記):" />
+
   <!-- 標準ボタンラベル -->
   <String Id="WixUIBack" Value="戻る(&amp;B)" />
   <String Id="WixUINext" Value="次へ(&amp;N)" />

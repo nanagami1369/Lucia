@@ -19,6 +19,10 @@
 
     <MediaTemplate EmbedCab="yes" />
 
+    <!-- インストール設定プロパティ（ダイアログのデフォルト値） -->
+    <Property Id="PORT" Value="6100" />
+    <Property Id="ALLOWED_SUBNET" Value="192.168.0.0/16" />
+
     <!-- ディレクトリ構造 -->
     <StandardDirectory Id="ProgramFiles64Folder">
       <Directory Id="INSTALLFOLDER" Name="Lucia">
@@ -37,7 +41,7 @@
                           Type="ownProcess"
                           Start="auto"
                           ErrorControl="normal"
-                          Arguments="--urls http://0.0.0.0:6100" />
+                          Arguments="--urls http://0.0.0.0:[PORT]" />
 
           <!-- サービス制御: インストール時に開始、アンインストール時に停止・削除 -->
           <ServiceControl Id="LuciaServerServiceControl"
@@ -52,12 +56,16 @@
                             Name="LuciaServer"
                             EventMessageFile="[INSTALLFOLDER]Lucia.Server.exe" />
 
-          <!-- ファイアウォール規則: TCP 6100 番ポート、ローカルサブネット、プライベートプロファイル -->
+          <!--
+            ファイアウォール規則: WiX でポートと基本スコープを設定する。
+            Firewall 拡張は RemoteAddresses を未サポートのため、
+            サブネット絞り込みは UpdateFirewallSubnet カスタムアクションで行う。
+          -->
           <fw:FirewallException Id="LuciaServerFirewall"
                                 Name="LuciaServer"
                                 Protocol="tcp"
-                                Port="6100"
-                                Scope="localSubnet"
+                                Port="[PORT]"
+                                Scope="any"
                                 Profile="private" />
         </Component>
 
@@ -72,8 +80,44 @@
     <!-- WixUI_InstallDir: インストール先選択付きの標準ダイアログセット -->
     <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
 
+    <!-- ConfigDlg を InstallDirDlg と VerifyReadyDlg の間に挿入 -->
+    <UI>
+      <!--
+        Order=5 で WixUI_InstallDir の既定 NewDialog (Order=4, Value=VerifyReadyDlg) を上書きする。
+        条件は既定と同じにして、パス検証が通ったときのみ遷移する。
+      -->
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="ConfigDlg" Order="5"
+               Condition="WIXUI_INSTALLDIR_VALID = 1 OR WIXUI_DONTVALIDATEPATH" />
+      <Publish Dialog="ConfigDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg" />
+      <Publish Dialog="ConfigDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" />
+    </UI>
+
     <!-- MIT ライセンス表示 -->
     <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+
+    <!--
+      WiX Firewall 拡張が RemoteAddresses 未サポートのため、
+      netsh で ALLOWED_SUBNET を反映するカスタムアクションを追加する。
+      SetProperty で即時フェーズに ALLOWED_SUBNET の値をキャプチャし、
+      遅延 CA に渡す（遅延 CA は直接プロパティを参照できないため）。
+    -->
+    <SetProperty Id="UpdateFirewallSubnet"
+                 Value='netsh advfirewall firewall set rule name="LuciaServer" new remoteip="[ALLOWED_SUBNET]"'
+                 Before="UpdateFirewallSubnet"
+                 Sequence="execute" />
+
+    <CustomAction Id="UpdateFirewallSubnet"
+                  Directory="SystemFolder"
+                  ExeCommand="[UpdateFirewallSubnet]"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+
+    <InstallExecuteSequence>
+      <!-- ファイアウォール規則追加後にサブネットを更新する（インストール・アップグレード時） -->
+      <Custom Action="UpdateFirewallSubnet" Before="InstallFinalize"
+              Condition="NOT Installed OR REINSTALL" />
+    </InstallExecuteSequence>
 
   </Package>
 
