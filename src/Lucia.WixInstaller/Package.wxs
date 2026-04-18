@@ -5,7 +5,7 @@
      xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
 
   <Package Name="Lucia"
-           Manufacturer="morihaya"
+           Manufacturer="nanagami1369"
            Version="!(bind.FileVersion.LuciaServerExe)"
            UpgradeCode="E8B7F3A1-4C2D-4E5F-9A1B-3C6D8E0F2A4B"
            Compressed="yes"

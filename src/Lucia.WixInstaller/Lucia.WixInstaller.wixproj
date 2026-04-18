@@ -9,13 +9,19 @@
   <PropertyGroup>
     <ServerProject>$(MSBuildProjectDirectory)\..\Lucia.Server\Lucia.Server\Lucia.Server.csproj</ServerProject>
     <ServerPublishDir>$(MSBuildProjectDirectory)\publish</ServerPublishDir>
-    <DefineConstants>PublishDir=$(ServerPublishDir)</DefineConstants>
+    <CustomActionsProject>$(MSBuildProjectDirectory)\..\Lucia.WixInstaller.CustomActions\Lucia.WixInstaller.CustomActions.csproj</CustomActionsProject>
+    <CustomActionsDll>$(MSBuildProjectDirectory)\..\Lucia.WixInstaller.CustomActions\bin\$(Configuration)\net472\Lucia.WixInstaller.CustomActions.CA.dll</CustomActionsDll>
+    <DefineConstants>PublishDir=$(ServerPublishDir);CustomActionsDll=$(CustomActionsDll)</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
     <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
     <PackageReference Include="WixToolset.Firewall.wixext" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(CustomActionsProject)" />
   </ItemGroup>
 
   <!--
