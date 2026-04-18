@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="ja-JP" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+
+  <!-- ダウングレードエラーメッセージ -->
+  <String Id="DowngradeError" Value="新しいバージョンの Lucia が既にインストールされています。" />
+
+  <!-- WixUI 標準文字列の日本語オーバーライド -->
+  <String Id="WelcomeDlgTitle" Value="{\WixUI_Font_Title}Lucia セットアップウィザードへようこそ" />
+  <String Id="WelcomeDlgDescription" Value="セットアップウィザードは Lucia をコンピューターにインストールします。「次へ」をクリックして続行するか、「キャンセル」をクリックしてウィザードを終了してください。" />
+
+  <String Id="InstallDirDlgTitle" Value="{\WixUI_Font_Title}インストール先フォルダー" />
+  <String Id="InstallDirDlgDescription" Value="Lucia のインストール先フォルダーを選択してください。" />
+  <String Id="InstallDirDlgFolderLabel" Value="Lucia のインストール先:" />
+  <String Id="InstallDirDlgChange" Value="変更(&amp;C)..." />
+
+  <String Id="LicenseAgreementDlgTitle" Value="{\WixUI_Font_Title}使用許諾契約" />
+  <String Id="LicenseAgreementDlgDescription" Value="Lucia をインストールする前に、以下の使用許諾契約をお読みください。" />
+  <String Id="LicenseAgreementDlgAccept" Value="使用許諾契約の条項に同意します(&amp;A)" />
+  <String Id="LicenseAgreementDlgDecline" Value="使用許諾契約の条項に同意しません(&amp;D)" />
+
+  <String Id="VerifyReadyDlgTitle" Value="{\WixUI_Font_Title}インストール準備完了" />
+  <String Id="VerifyReadyDlgInstallText" Value="「インストール」をクリックして開始してください。設定を変更する場合は「戻る」をクリックしてください。" />
+
+  <String Id="ProgressDlgTitleInstalling" Value="{\WixUI_Font_Title}Lucia をインストールしています" />
+  <String Id="ProgressDlgTitleRepairing" Value="{\WixUI_Font_Title}Lucia を修復しています" />
+  <String Id="ProgressDlgTitleRemoving" Value="{\WixUI_Font_Title}Lucia を削除しています" />
+
+  <String Id="ExitDlgTitle" Value="{\WixUI_Font_Title}Lucia セットアップウィザードの完了" />
+  <String Id="ExitDlgDescription" Value="Lucia のインストールが完了しました。「完了」をクリックしてウィザードを終了してください。" />
+
+  <String Id="MaintenanceTypeDlgTitle" Value="{\WixUI_Font_Title}Lucia セットアップの変更" />
+  <String Id="MaintenanceTypeDlgRepairText" Value="インストールエラーを修復します。欠落ファイルの修正、ショートカットの修正、レジストリエントリの修正を行います。" />
+  <String Id="MaintenanceTypeDlgRemoveText" Value="コンピューターから Lucia を削除します。" />
+
+  <!-- 標準ボタンラベル -->
+  <String Id="WixUIBack" Value="戻る(&amp;B)" />
+  <String Id="WixUINext" Value="次へ(&amp;N)" />
+  <String Id="WixUICancel" Value="キャンセル" />
+  <String Id="WixUIInstall" Value="インストール(&amp;I)" />
+  <String Id="WixUIFinish" Value="完了(&amp;F)" />
+
+</WixLocalization>

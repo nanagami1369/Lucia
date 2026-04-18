@@ -1,0 +1,32 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+
+  <PropertyGroup>
+    <Platform>x64</Platform>
+    <DefaultLanguage>ja-JP</DefaultLanguage>
+    <OutputName>Lucia</OutputName>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ServerProject>$(MSBuildProjectDirectory)\..\Lucia.Server\Lucia.Server\Lucia.Server.csproj</ServerProject>
+    <ServerPublishDir>$(MSBuildProjectDirectory)\publish</ServerPublishDir>
+    <DefineConstants>PublishDir=$(ServerPublishDir)</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Firewall.wixext" Version="5.0.2" />
+  </ItemGroup>
+
+  <!--
+    Release ビルド時に Lucia.Server を publish する。
+    WiX ビルドの前に実行し、publish 出力を WiX の Source パスとして参照する。
+  -->
+  <Target Name="PublishServer" BeforeTargets="BeforeBuild">
+    <Message Text="[Lucia.WixInstaller] Lucia.Server を発行しています..." Importance="high" />
+    <RemoveDir Directories="$(ServerPublishDir)" />
+    <Exec Command="dotnet publish &quot;$(ServerProject)&quot; --configuration Release --runtime win-x64 --no-self-contained --output &quot;$(ServerPublishDir)&quot;" />
+    <Message Text="[Lucia.WixInstaller] 発行完了: $(ServerPublishDir)" Importance="high" />
+  </Target>
+
+</Project>

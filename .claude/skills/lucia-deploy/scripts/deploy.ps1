@@ -1,8 +1,3 @@
-# デプロイ設定（変更する場合はこのファイルを直接編集すること）
-$Port          = 6100
-$InstallPath   = 'C:\Program Files\Lucia'
-$AllowedSubnet = '192.168.0.0/16'
-
 # このスクリプトは <repo>/.claude/skills/lucia-deploy/scripts/ に配置されている
 # $PSScriptRoot から 4 階層上がリポジトリルート
 $RepoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..\..' ))
@@ -29,43 +24,34 @@ function Write-Log([string]$message) {
     Add-Content $LogFile -Value $message -Encoding UTF8
 }
 
-$InstallerProject = Join-Path $RepoRoot 'src\Lucia.Installer\Lucia.Installer.csproj'
-$PublishDir       = Join-Path $RepoRoot 'publish\Lucia.Installer'
-$InstallerExe     = Join-Path $PublishDir 'Lucia.Installer.exe'
+$WixProject = Join-Path $RepoRoot 'src\Lucia.WixInstaller\Lucia.WixInstaller.wixproj'
+$MsiPath    = Join-Path $RepoRoot 'src\Lucia.WixInstaller\bin\x64\Release\ja-JP\Lucia.msi'
 
 Write-Log ''
 Write-Log '=== Lucia deploy ==='
-Write-Log "  リポジトリ    : $RepoRoot"
-Write-Log "  ポート        : $Port"
-Write-Log "  インストール先: $InstallPath"
-Write-Log "  許可サブネット: $AllowedSubnet"
+Write-Log "  リポジトリ: $RepoRoot"
 
-# Lucia.Installer を Release publish
-# （csproj 内の BuildServerBundle Target が Lucia.Server のビルド・zip 化・埋め込みを自動実行する）
+# Lucia.WixInstaller を Release ビルド
+# （wixproj 内の PublishServer Target が Lucia.Server の publish を自動実行する）
 Write-Log ''
-Write-Log '>>> Lucia.Installer をビルド・発行しています...'
-dotnet publish $InstallerProject `
-    --configuration Release `
-    --output $PublishDir
+Write-Log '>>> MSI インストーラーをビルドしています...'
+dotnet build $WixProject --configuration Release
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Log 'Lucia.Installer のビルドに失敗しました。'
+    Write-Log 'MSI のビルドに失敗しました。'
     exit 1
 }
-Write-Log "  発行先: $PublishDir"
+Write-Log "  MSI: $MsiPath"
 
-# Lucia.Installer.exe でインストール実行
-# （既に昇格済みのため requireAdministrator は問題なく動作する）
+# MSI でサイレントインストール実行
+# MajorUpgrade により旧バージョンは自動アンインストールされる
 Write-Log ''
-Write-Log '>>> インストールを実行しています...'
-& $InstallerExe install `
-    --port $Port `
-    --install-path $InstallPath `
-    --allowed-subnet $AllowedSubnet `
-    --silent
+Write-Log '>>> MSI インストールを実行しています...'
+$msiLog = Join-Path $RepoRoot 'logs\lucia-msi.log'
+msiexec /i $MsiPath /quiet /norestart /l*v $msiLog
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Log 'インストールに失敗しました。'
+    Write-Log "インストールに失敗しました。詳細ログ: $msiLog"
     exit 1
 }
 

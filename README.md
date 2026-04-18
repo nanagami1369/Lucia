@@ -104,15 +104,15 @@ dotnet run --project src/Lucia.Server/Lucia.Server/Lucia.Server.csproj
 
 ## デプロイ（Windows Service）
 
-### インストール
-
-`Lucia.Installer.csproj` を発行します。内部で Lucia.Server のビルド・同梱まで自動実行されます。
+### MSI インストーラーのビルド
 
 ```bash
-dotnet publish src/Lucia.Installer/Lucia.Installer.csproj --configuration Release --output ./publish/Lucia.Installer
+dotnet build src/Lucia.WixInstaller/Lucia.WixInstaller.wixproj --configuration Release
 ```
 
-発行後、`publish/Lucia.Installer/Lucia.Installer.exe` を実行してインストールします（UAC ダイアログが表示されます）。
+`src/Lucia.WixInstaller/bin/x64/Release/ja-JP/Lucia.msi` が生成されます。ダブルクリックでインストールできます。
+
+詳細は [ユーザーガイド](docs/USER_GUIDE.md) を参照してください。
 
 ## ライセンス
 

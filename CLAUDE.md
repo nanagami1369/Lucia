@@ -20,10 +20,10 @@ dotnet run --project src/Lucia.Server/Lucia.Server/Lucia.Server.csproj
 # リリースビルド
 dotnet build --configuration Release
 
-# インストーラーのビルド＆発行（Windows Service 用）
-# publish/Lucia.Installer フォルダに出力される
-# 内部で Lucia.Server のビルド・zip 化・同梱まで自動実行される
-dotnet publish src/Lucia.Installer/Lucia.Installer.csproj --configuration Release --output ./publish/Lucia.Installer
+# MSI インストーラーのビルド（Windows Service 用）
+# src/Lucia.WixInstaller/bin/x64/Release/ja-JP/Lucia.msi に出力される
+# 内部で Lucia.Server の publish まで自動実行される
+dotnet build src/Lucia.WixInstaller/Lucia.WixInstaller.wixproj --configuration Release
 ```
 
 ## アーキテクチャ
@@ -67,12 +67,13 @@ Windows OS (Cassia で RDP セッション / ProcessX で電源コマンド)
 
 すべてのサービスは `StatsLogger` を通じてログを記録し、本番環境では Windows イベントログに出力される。
 
-## Lucia.Installer のビルド設計原則
+## Lucia.WixInstaller のビルド設計原則
 
-**`dotnet publish Lucia.Installer --configuration Release` 単体で完結すること。**
+**`dotnet build Lucia.WixInstaller --configuration Release` 単体で完結すること。**
 
-- Lucia.Installer は一般ユーザーが配布された `.exe` を実行してインストールする。
-- Lucia.Server のビルド・zip 化・EmbeddedResource への埋め込みはすべて `Lucia.Installer.csproj` の `BuildServerBundle` MSBuild Target に実装し、`BeforeTargets="CoreCompile"` で自動実行されるようにする。
+- WiX v5（WixToolset.Sdk）ベースの MSI インストーラー。
+- Lucia.Server の publish は `Lucia.WixInstaller.wixproj` の `PublishServer` MSBuild Target に実装し、`BeforeTargets="BeforeBuild"` で自動実行される。
+- MSI は Windows Service 登録、イベントログソース登録、ファイアウォール規則設定を含む。
 
 ## docs/notes への知見の記録
 

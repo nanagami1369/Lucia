@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util"
+     xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
+
+  <Package Name="Lucia"
+           Manufacturer="morihaya"
+           Version="!(bind.FileVersion.LuciaServerExe)"
+           UpgradeCode="E8B7F3A1-4C2D-4E5F-9A1B-3C6D8E0F2A4B"
+           Compressed="yes"
+           InstallerVersion="500"
+           Scope="perMachine">
+
+    <SummaryInformation Description="Lucia - Windows RDS ホスト管理ダッシュボード" />
+
+    <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)"
+                  Schedule="afterInstallInitialize" />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- ディレクトリ構造 -->
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="Lucia">
+
+        <!-- メイン実行ファイル + サービス構成 -->
+        <Component Id="LuciaServerService" Guid="A1B2C3D4-E5F6-7890-ABCD-EF1234567890">
+          <File Id="LuciaServerExe"
+                Source="$(var.PublishDir)\Lucia.Server.exe"
+                KeyPath="yes" />
+
+          <!-- Windows Service 登録（自動起動） -->
+          <ServiceInstall Id="LuciaServerServiceInstall"
+                          Name="LuciaServer"
+                          DisplayName="Lucia Session Monitor"
+                          Description="Lucia Windows RDS ホスト管理ダッシュボード サービス"
+                          Type="ownProcess"
+                          Start="auto"
+                          ErrorControl="normal"
+                          Arguments="--urls http://0.0.0.0:6100" />
+
+          <!-- サービス制御: インストール時に開始、アンインストール時に停止・削除 -->
+          <ServiceControl Id="LuciaServerServiceControl"
+                          Name="LuciaServer"
+                          Start="install"
+                          Stop="both"
+                          Remove="uninstall"
+                          Wait="yes" />
+
+          <!-- Windows イベントログソース登録 -->
+          <util:EventSource Log="Application"
+                            Name="LuciaServer"
+                            EventMessageFile="[INSTALLFOLDER]Lucia.Server.exe" />
+
+          <!-- ファイアウォール規則: TCP 6100 番ポート、ローカルサブネット、プライベートプロファイル -->
+          <fw:FirewallException Id="LuciaServerFirewall"
+                                Name="LuciaServer"
+                                Protocol="tcp"
+                                Port="6100"
+                                Scope="localSubnet"
+                                Profile="private" />
+        </Component>
+
+        <!-- publish 出力の残りファイルを自動収集（Lucia.Server.exe は上で個別定義済み） -->
+        <Files Include="$(var.PublishDir)\**">
+          <Exclude Files="$(var.PublishDir)\Lucia.Server.exe" />
+        </Files>
+
+      </Directory>
+    </StandardDirectory>
+
+    <!-- WixUI_InstallDir: インストール先選択付きの標準ダイアログセット -->
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+
+    <!-- MIT ライセンス表示 -->
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+
+  </Package>
+
+</Wix>

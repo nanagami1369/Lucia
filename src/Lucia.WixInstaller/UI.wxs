@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+  <Fragment>
+    <!-- WixUI 標準フォントを Meiryo UI にオーバーライド -->
+    <UI>
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Meiryo UI" Size="9" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Meiryo UI" Size="12" Bold="yes" />
+      <TextStyle Id="WixUI_Font_Title"  FaceName="Meiryo UI" Size="12" Bold="yes" />
+    </UI>
+  </Fragment>
+
+</Wix>

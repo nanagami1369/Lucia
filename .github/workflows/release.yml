@@ -23,31 +23,17 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Publish Lucia.Installer
+      - name: Build MSI Installer
         run: |
-          dotnet publish src/Lucia.Installer/Lucia.Installer.csproj `
-            --configuration Release `
-            --output ./publish/Lucia.Installer
-
-      - name: Compute SHA256
-        id: hash
-        shell: pwsh
-        run: |
-          $exePath = "publish/Lucia.Installer/Lucia.Installer.exe"
-          $hash = (Get-FileHash -Algorithm SHA256 $exePath).Hash.ToLower()
-          Write-Output "sha256=$hash" >> $env:GITHUB_OUTPUT
-
-          # ハッシュファイルも生成（検証用）
-          "$hash  Lucia.Installer.exe" | Set-Content "publish/Lucia.Installer/Lucia.Installer.exe.sha256"
-          Write-Host "SHA256: $hash"
+          dotnet build src/Lucia.WixInstaller/Lucia.WixInstaller.wixproj `
+            --configuration Release
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           files: |
-            publish/Lucia.Installer/Lucia.Installer.exe
-            publish/Lucia.Installer/Lucia.Installer.exe.sha256
+            src/Lucia.WixInstaller/bin/x64/Release/ja-JP/Lucia.msi
           append_body: true
           body: |
             インストール方法は [ユーザーガイド](https://github.com/nanagami1369/Lucia/blob/main/docs/USER_GUIDE.md) を参照してください。
