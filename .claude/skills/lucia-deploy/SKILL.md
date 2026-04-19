@@ -1,10 +1,19 @@
 ---
 name: lucia-deploy
-description: This skill should be used when the user asks to "デプロイ", "再発行", "redeploy", "deploy", "install", "インストール", or mentions publishing Lucia as a Windows Service. Provides the complete workflow for building Lucia.WixInstaller MSI and deploying it as a Windows Service.
+description: >
+  開発中のバージョンをビルドして開発マシンに再インストールするための開発者向けスキル。
+  ユーザーへの配布・通常インストール用ではない。
+  Use ONLY when the developer asks to rebuild and reinstall the current working branch on their own machine:
+  "デプロイ", "再インストール", "redeploy", "再発行" in a development context.
+  Do NOT use for end-user installation instructions or production deployment guidance.
 version: 2.0.0
 ---
 
 # Lucia デプロイスキル
+
+> **このスキルは開発者専用です。**
+> 開発中のブランチをビルドして開発マシンに再インストールするためのものです。
+> エンドユーザーへの配布・通常インストールには使いません。
 
 Lucia.WixInstaller で MSI をビルドし、Windows Service としてインストール（または再インストール）する。
 
