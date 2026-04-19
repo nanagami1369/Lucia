@@ -43,14 +43,27 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Log "  MSI: $MsiPath"
 
-# MSI でサイレントインストール実行
-# MajorUpgrade により旧バージョンは自動アンインストールされる
+# 既存バージョンを先にアンインストール（同一 ProductCode の Repair モードを防ぐ）
+$existing = Get-Package -Name 'Lucia' -ProviderName msi -ErrorAction SilentlyContinue
+if ($existing) {
+    Write-Log ''
+    Write-Log ">>> 既存バージョン ($($existing.Version)) をアンインストールしています..."
+    $msiUninstallLog = Join-Path $RepoRoot 'logs\lucia-msi-uninstall.log'
+    $uninstallProcess = Start-Process msiexec -ArgumentList "/x `"$($existing.TagId)`" /quiet /norestart /l*v `"$msiUninstallLog`"" -Wait -NoNewWindow -PassThru
+    if ($uninstallProcess.ExitCode -ne 0) {
+        Write-Log "アンインストールに失敗しました。詳細ログ: $msiUninstallLog"
+        exit 1
+    }
+    Write-Log '  アンインストール完了'
+}
+
+# MSI でクリーンインストール実行
 Write-Log ''
 Write-Log '>>> MSI インストールを実行しています...'
 $msiLog = Join-Path $RepoRoot 'logs\lucia-msi.log'
-msiexec /i $MsiPath /quiet /norestart /l*v $msiLog
+$installProcess = Start-Process msiexec -ArgumentList "/i `"$MsiPath`" /quiet /norestart /l*v `"$msiLog`"" -Wait -NoNewWindow -PassThru
 
-if ($LASTEXITCODE -ne 0) {
+if ($installProcess.ExitCode -ne 0) {
     Write-Log "インストールに失敗しました。詳細ログ: $msiLog"
     exit 1
 }
