@@ -75,11 +75,11 @@ Windows OS (Cassia で RDP セッション / ProcessX で電源コマンド)
 - Lucia.Server の publish は `Lucia.WixInstaller.wixproj` の `PublishServer` MSBuild Target に実装し、`BeforeTargets="BeforeBuild"` で自動実行される。
 - MSI は Windows Service 登録、イベントログソース登録、ファイアウォール規則設定を含む。
 
-## docs/notes への知見の記録
+## docs/ へのドキュメント記録
 
-- `docs/notes/` に技術的な知見を積極的に書き込む。書き込む前に許可を求めない。
-- プロジェクト固有の名称（サービス名・クラス名・パス等）は使わず、他プロジェクトでも再利用できる汎用的な表現にする。
-- 各ノートの frontmatter は以下のフォーマットとする：
+- `docs/` 直下: プロジェクト固有の仕様書・設計資料・移行計画等。
+- `docs/notes/` : 他プロジェクトでも再利用できる汎用的な技術知見。プロジェクト固有の名称（サービス名・クラス名・パス等）は使わない。書き込む前に許可を求めない。
+- `docs/notes/` の各ノートの frontmatter は以下のフォーマットとする：
 
 ```markdown
 ---
