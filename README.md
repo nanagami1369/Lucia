@@ -44,6 +44,7 @@ Windows RDSホスト 管理ダッシュボード。RDP セッション管理と�
 | SignalR | リアルタイム双方向通信 |
 | [Cassia](https://github.com/danports/cassia) | RDP / ターミナルサービス セッション管理 |
 | [ProcessX](https://github.com/Cysharp/ProcessX) | 電源コマンド実行 |
+| [ConsoleAppFramework](https://github.com/Cysharp/ConsoleAppFramework) | CLI インストーラーのコマンド定義 |
 | Windows Event Log | 本番環境ロギング |
 
 ## プロジェクト構成
@@ -55,7 +56,8 @@ src/
 │   └── Lucia.Server.Client/    # Blazor WebAssembly クライアント UI・Hub クライアント
 ├── Lucia.Services/             # ビジネスロジック（セッション・電源・タイマー管理）
 ├── Lucia.Models/               # ドメインモデル（SessionInfo・SessionState 等）
-└── LuciaServer.Shared/         # Hub インターフェース（ISessionHub・IPowerHub 等）
+├── LuciaServer.Shared/         # Hub インターフェース（ISessionHub・IPowerHub 等）
+└── Lucia.Installer/            # CLI インストーラー（Lucia.Installer.exe）
 ```
 
 | プロジェクト | 役割 |
@@ -65,6 +67,7 @@ src/
 | `Lucia.Services` | ビジネスロジック（セッション・電源・タイマー管理） |
 | `Lucia.Models` | ドメインモデル（`SessionInfo`、`SessionState` 等） |
 | `LuciaServer.Shared` | Hub インターフェース（`ISessionHub`、`IPowerHub` 等） |
+| `Lucia.Installer` | CLI インストーラー（Windows Service 登録・FW 設定・レジストリ管理） |
 
 ## アーキテクチャ
 
@@ -104,13 +107,13 @@ dotnet run --project src/Lucia.Server/Lucia.Server/Lucia.Server.csproj
 
 ## デプロイ（Windows Service）
 
-### MSI インストーラーのビルド
+### CLI インストーラーのビルド
 
 ```bash
-dotnet build src/Lucia.WixInstaller/Lucia.WixInstaller.wixproj --configuration Release
+dotnet publish src/Lucia.Installer/Lucia.Installer.csproj --configuration Release
 ```
 
-`src/Lucia.WixInstaller/bin/x64/Release/ja-JP/Lucia.msi` が生成されます。ダブルクリックでインストールできます。
+`src/Lucia.Installer/bin/Release/net10.0-windows/win-x64/publish/Lucia.Installer.exe` が生成されます。ダブルクリックでインストールできます。
 
 詳細は [ユーザーガイド](docs/USER_GUIDE.md) を参照してください。
 
