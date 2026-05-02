@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>installer</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ServerProject>$(MSBuildProjectDirectory)\..\Lucia.Server\Lucia.Server\Lucia.Server.csproj</ServerProject>
+    <AppPublishDir>$(MSBuildProjectDirectory)\app-publish</AppPublishDir>
+    <AppBundleZip>$(MSBuildProjectDirectory)\app-bundle.zip</AppBundleZip>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ConsoleAppFramework" Version="5.7.13">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="ProcessX" Version="1.5.6" />
+    <PackageReference Include="System.ServiceProcess.ServiceController" Version="10.0.6" />
+  </ItemGroup>
+
+  <!--
+    自己コピー方式のアンインストールで TEMP コピーが動作するために SingleFile が必要。
+    フレームワーク依存（.NET ランタイムは対象機に必要）だが DLL は EXE に内包される。
+  -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <EmbeddedResource Include="$(AppBundleZip)" LogicalName="app-bundle.zip" />
+  </ItemGroup>
+
+  <!--
+    CoreCompile より前に実行して EmbeddedResource に確実に取り込まれるようにする。
+    Release 時のみ実行。Debug ではバンドルなしで UI フローのみ動作確認可能。
+  -->
+  <Target Name="BuildServerBundle" BeforeTargets="CoreCompile" Condition="'$(Configuration)' == 'Release'">
+    <Message Text="[Lucia.Installer] Lucia.Server をパブリッシュしてバンドルを生成しています..." Importance="high" />
+    <RemoveDir Directories="$(AppPublishDir)" />
+    <Delete Files="$(AppBundleZip)" Condition="Exists('$(AppBundleZip)')" />
+    <MakeDir Directories="$(AppPublishDir)" />
+    <Exec Command="dotnet publish &quot;$(ServerProject)&quot; --configuration Release --runtime win-x64 --no-self-contained --output &quot;$(AppPublishDir)&quot;" />
+    <ZipDirectory SourceDirectory="$(AppPublishDir)" DestinationFile="$(AppBundleZip)" Overwrite="true" />
+    <Message Text="[Lucia.Installer] バンドル生成完了: $(AppBundleZip)" Importance="high" />
+  </Target>
+
+</Project>

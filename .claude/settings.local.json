@@ -2,7 +2,16 @@
   "permissions": {
     "allow": [
       "Bash(pwsh -ExecutionPolicy Bypass -File .claude/skills/lucia-deploy/scripts/deploy.ps1 2>&1)",
-      "Bash(pwsh -NoProfile -Command \"Get-Content 'logs/lucia-deploy.log' -Encoding UTF8\")"
+      "Bash(pwsh -NoProfile -Command \"Get-Content 'logs/lucia-deploy.log' -Encoding UTF8\")",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet sln:*)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(pwsh -ExecutionPolicy Bypass -File .claude/skills/lucia-deploy/scripts/deploy.ps1)",
+      "Bash(pwsh -ExecutionPolicy Bypass -File scripts/Test-InstallerIntegration.ps1)",
+      "Bash(dotnet new wpf *)",
+      "Bash(dotnet add *)",
+      "Bash(dotnet publish *)"
     ]
   }
 }

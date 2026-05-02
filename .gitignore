@@ -185,8 +185,9 @@ DocProject/Help/html
 # Click-Once directory
 publish/
 
-# Lucia.WixInstaller ビルド成果物（Release 時に自動生成される）
-src/Lucia.WixInstaller/publish/
+# Lucia.Installer ビルド成果物（BuildServerBundle Target が Release 時に自動生成）
+src/Lucia.Installer/app-bundle.zip
+src/Lucia.Installer/app-publish/
 
 # Publish Web Output
 *.[Pp]ublish.xml
