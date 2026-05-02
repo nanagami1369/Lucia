@@ -30,6 +30,7 @@
     21  modify（未インストール時）は終了コード 1  サービスなし   modify --port 7300 --yes
     22  --help は終了コード 0                  -                 --help
     23  不明なコマンドは終了コード 1           -                 unknown-command
+    24  引数なし起動はインストールプロンプトを表示してキャンセルで正常終了  サービスなし  (引数なし) → stdin "n"
 
 .PARAMETER InstallerPath
     テスト対象の Lucia.Installer.exe のパス。省略時は Release publish の出力先を使用。
@@ -107,7 +108,12 @@ function Write-Warn([string]$message) { Write-Log "  [WARN] $message" 'Yellow' }
 function Write-Info([string]$message) { Write-Log "  [INFO] $message" 'Gray' }
 
 function Invoke-Installer {
-    param([string[]]$Arguments)
+    param(
+        [string[]]$Arguments,
+        # stdin に書き込む文字列。省略時は stdin をリダイレクトしない（対話的入力待ち）。
+        # 引数なし起動テストなど確認プロンプトに応答が必要な場合に使用する。
+        [string]$StdinContent = $null
+    )
 
     # スペースを含む引数は二重引用符で囲む（末尾バックスラッシュはエスケープ回避のため除去）
     $argString = ($Arguments | ForEach-Object {
@@ -115,16 +121,28 @@ function Invoke-Installer {
         else { $_ }
     }) -join ' '
 
-    Write-Info "実行: Lucia.Installer.exe $argString"
+    $displayArgs = if ($argString) { $argString } else { '(引数なし)' }
+    Write-Info "実行: Lucia.Installer.exe $displayArgs"
 
     $stdoutFile = [System.IO.Path]::GetTempFileName()
     $stderrFile = [System.IO.Path]::GetTempFileName()
+    $stdinFile  = $null
     try {
-        $process = Start-Process -FilePath $InstallerPath `
-                                 -ArgumentList $argString `
-                                 -Wait -PassThru -NoNewWindow `
-                                 -RedirectStandardOutput $stdoutFile `
-                                 -RedirectStandardError $stderrFile
+        $startParams = @{
+            FilePath               = $InstallerPath
+            ArgumentList           = $argString
+            Wait                   = $true
+            PassThru               = $true
+            NoNewWindow            = $true
+            RedirectStandardOutput = $stdoutFile
+            RedirectStandardError  = $stderrFile
+        }
+        if ($null -ne $StdinContent) {
+            $stdinFile = [System.IO.Path]::GetTempFileName()
+            Set-Content $stdinFile -Value $StdinContent -Encoding UTF8
+            $startParams['RedirectStandardInput'] = $stdinFile
+        }
+        $process = Start-Process @startParams
         $stdout = Get-Content $stdoutFile -Encoding UTF8 -ErrorAction SilentlyContinue
         $stderr = Get-Content $stderrFile -Encoding UTF8 -ErrorAction SilentlyContinue
         if ($stdout) { $stdout | ForEach-Object { Write-Info $_ } }
@@ -132,7 +150,8 @@ function Invoke-Installer {
         Write-Info "終了コード: $($process.ExitCode)"
         return $process.ExitCode
     } finally {
-        Remove-Item $stdoutFile, $stderrFile -ErrorAction SilentlyContinue
+        $filesToRemove = @($stdoutFile, $stderrFile) + @(if ($stdinFile) { $stdinFile })
+        Remove-Item $filesToRemove -ErrorAction SilentlyContinue
     }
 }
 
@@ -532,6 +551,15 @@ Run-Test '22' '--help は終了コード 0 で終了する' {
 Run-Test '23' '不明なコマンドは終了コード 1 で失敗する' {
     $exitCode = Invoke-Installer @('unknown-command')
     Assert-ExitCode $exitCode @(1) '不明なコマンドが 1 で失敗する'
+}
+
+Run-Test '24' '引数なし起動はインストールプロンプトを表示してキャンセルで正常終了する' {
+    Ensure-Clean
+    # 引数なし = install コマンドと同じ動作。確認プロンプトに "n" を渡してキャンセル。
+    $exitCode = Invoke-Installer -Arguments @() -StdinContent 'n'
+    Assert-ExitCode $exitCode @(0) '引数なし起動がキャンセルで 0 で終了する'
+    Assert-ServiceNotExists 'キャンセル後にサービスが存在しない'
+    Assert-FirewallRuleNotExists 'キャンセル後に FW 規則が存在しない'
 }
 
 # ════════════════════════════════════════════════════════════

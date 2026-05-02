@@ -1,16 +1,15 @@
 using System.Text;
 using ConsoleAppFramework;
 using Lucia.Installer;
-using Lucia.Installer.Services;
 
 Console.OutputEncoding = Encoding.UTF8;
 Console.InputEncoding = Encoding.UTF8;
 
-// 引数なし: ステータス表示（ConsoleAppFramework はデフォルトでヘルプを表示するため先行処理）
+// 引数なし: install を実行する
+// ダブルクリック起動でもインストーラーとして機能するようにするため。
 if (args.Length == 0)
 {
-    ShowDefaultStatus();
-    return;
+    args = ["install"];
 }
 
 // 不明なコマンドを ConsoleAppFramework に渡す前に検出する
@@ -27,22 +26,3 @@ if (!knownCommands.Contains(args[0]))
 var app = ConsoleApp.Create();
 app.Add<InstallerCommands>();
 await app.RunAsync(args);
-
-static void ShowDefaultStatus()
-{
-    var options = InstallService.ReadInstallOptionsFromRegistry();
-    if (options is not null)
-    {
-        Console.WriteLine("Lucia はインストール済みです。");
-        Console.WriteLine($"  インストール先: {options.InstallDirectory}");
-        Console.WriteLine($"  ポート番号    : {options.Port}");
-        Console.WriteLine($"  サブネット    : {options.AllowedSubnet}");
-        Console.WriteLine();
-        Console.WriteLine("利用可能なコマンド: install / uninstall / modify / status / --help");
-    }
-    else
-    {
-        Console.WriteLine("Lucia はインストールされていません。");
-        Console.WriteLine("インストールするには: Lucia.Installer.exe install");
-    }
-}
