@@ -7,8 +7,9 @@
 #
 # このスクリプトは <repo>/.claude/skills/lucia-deploy/scripts/ に配置されている
 # $PSScriptRoot から 4 階層上がリポジトリルート
-$RepoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..\..' ))
-$LogFile  = Join-Path $RepoRoot 'logs\lucia-deploy.log'
+$RepoRoot      = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..\..' ))
+$LogFile       = Join-Path $RepoRoot 'logs\lucia-deploy.log'
+$InstallerPath = Join-Path $RepoRoot 'src\Lucia.Installer\bin\Release\net10.0-windows\win-x64\publish\installer.exe'
 New-Item -ItemType Directory -Force -Path (Split-Path $LogFile) | Out-Null
 
 # 管理者権限チェック: 非昇格の場合はログファイル経由で出力を受け取りながら自己を昇格再実行する
@@ -26,54 +27,74 @@ if (-not $isAdmin) {
     exit
 }
 
-function Write-Log([string]$message) {
-    Write-Host $message
+function Write-Log([string]$message, [string]$color = 'White') {
+    Write-Host $message -ForegroundColor $color
     Add-Content $LogFile -Value $message -Encoding UTF8
 }
 
-$WixProject = Join-Path $RepoRoot 'src\Lucia.WixInstaller\Lucia.WixInstaller.wixproj'
-$MsiPath    = Join-Path $RepoRoot 'src\Lucia.WixInstaller\bin\x64\Release\ja-JP\Lucia.msi'
+function Invoke-Installer([string[]]$Arguments) {
+    $argString = ($Arguments | ForEach-Object {
+        if ($_ -match '[\s"]') { '"' + $_.TrimEnd('\').Replace('"', '\"') + '"' }
+        else { $_ }
+    }) -join ' '
+
+    Write-Log "  実行: installer.exe $argString" 'Gray'
+
+    $stdoutFile = [System.IO.Path]::GetTempFileName()
+    $stderrFile = [System.IO.Path]::GetTempFileName()
+    try {
+        $process = Start-Process -FilePath $InstallerPath `
+                                 -ArgumentList $argString `
+                                 -Wait -PassThru -NoNewWindow `
+                                 -RedirectStandardOutput $stdoutFile `
+                                 -RedirectStandardError  $stderrFile
+        $stdout = Get-Content $stdoutFile -Encoding UTF8 -ErrorAction SilentlyContinue
+        $stderr = Get-Content $stderrFile -Encoding UTF8 -ErrorAction SilentlyContinue
+        if ($stdout) { $stdout | ForEach-Object { Write-Log "  $_" 'Gray' } }
+        if ($stderr) { $stderr | ForEach-Object { Write-Log "  [STDERR] $_" 'Yellow' } }
+        return $process.ExitCode
+    } finally {
+        Remove-Item $stdoutFile, $stderrFile -ErrorAction SilentlyContinue
+    }
+}
 
 Write-Log ''
-Write-Log '=== Lucia deploy ==='
+Write-Log '=== Lucia redeploy ===' 'Cyan'
 Write-Log "  リポジトリ: $RepoRoot"
 
-# Lucia.WixInstaller を Release ビルド
-# （wixproj 内の PublishServer Target が Lucia.Server の publish を自動実行する）
+# ── Step 1: CLI インストーラーを Release ビルド ────────────────────────────
+# dotnet publish が内部で Lucia.Server の publish → app-bundle.zip 生成まで自動実行する
 Write-Log ''
-Write-Log '>>> MSI インストーラーをビルドしています...'
-dotnet build $WixProject --configuration Release
-
+Write-Log '>>> CLI インストーラーをビルドしています...' 'Cyan'
+$csproj = Join-Path $RepoRoot 'src\Lucia.Installer\Lucia.Installer.csproj'
+dotnet publish $csproj --configuration Release
 if ($LASTEXITCODE -ne 0) {
-    Write-Log 'MSI のビルドに失敗しました。'
+    Write-Log 'ビルドに失敗しました。' 'Red'
     exit 1
 }
-Write-Log "  MSI: $MsiPath"
+Write-Log "  installer.exe: $InstallerPath" 'Gray'
 
-# 既存バージョンを先にアンインストール（同一 ProductCode の Repair モードを防ぐ）
-$existing = Get-Package -Name 'Lucia' -ProviderName msi -ErrorAction SilentlyContinue
-if ($existing) {
-    Write-Log ''
-    Write-Log ">>> 既存バージョン ($($existing.Version)) をアンインストールしています..."
-    $msiUninstallLog = Join-Path $RepoRoot 'logs\lucia-msi-uninstall.log'
-    $uninstallProcess = Start-Process msiexec -ArgumentList "/x `"$($existing.TagId)`" /quiet /norestart /l*v `"$msiUninstallLog`"" -Wait -NoNewWindow -PassThru
-    if ($uninstallProcess.ExitCode -ne 0) {
-        Write-Log "アンインストールに失敗しました。詳細ログ: $msiUninstallLog"
-        exit 1
-    }
-    Write-Log '  アンインストール完了'
+# ── Step 2: 既存インストールをアンインストール ────────────────────────────
+Write-Log ''
+Write-Log '>>> 既存バージョンをアンインストールしています...' 'Cyan'
+$uninstallCode = Invoke-Installer @('uninstall', '--yes')
+if ($uninstallCode -eq 0) {
+    Write-Log '  アンインストール完了' 'Gray'
+} elseif ($uninstallCode -eq 1) {
+    Write-Log '  未インストール状態のため、スキップします' 'Gray'
+} else {
+    Write-Log "  アンインストールに失敗しました (ExitCode: $uninstallCode)" 'Red'
+    exit 1
 }
 
-# MSI でクリーンインストール実行
+# ── Step 3: 新バージョンをインストール ───────────────────────────────────
 Write-Log ''
-Write-Log '>>> MSI インストールを実行しています...'
-$msiLog = Join-Path $RepoRoot 'logs\lucia-msi.log'
-$installProcess = Start-Process msiexec -ArgumentList "/i `"$MsiPath`" /quiet /norestart /l*v `"$msiLog`"" -Wait -NoNewWindow -PassThru
-
-if ($installProcess.ExitCode -ne 0) {
-    Write-Log "インストールに失敗しました。詳細ログ: $msiLog"
+Write-Log '>>> 新バージョンをインストールしています...' 'Cyan'
+$installCode = Invoke-Installer @('install', '--yes')
+if ($installCode -ne 0) {
+    Write-Log "インストールに失敗しました (ExitCode: $installCode)" 'Red'
     exit 1
 }
 
 Write-Log ''
-Write-Log '=== deploy 完了 ==='
+Write-Log '=== redeploy 完了 ===' 'Green'
