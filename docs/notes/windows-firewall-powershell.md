@@ -1,6 +1,6 @@
 ---
-tags: powershell,windows,firewall,network
-updated: 2026-03-20 13:04:20
+tags: powershell,windows,firewall,network,netsh
+updated: 2026-05-03 00:00:00
 ---
 
 # Windows Firewall と PowerShell
@@ -59,3 +59,20 @@ $matched = $matchesDirect -or $matchesDotted
 ```
 
 **注意：** PowerShell の `-shl` 演算子は符号付き整数として動作するため、`0xFFFFFFFF -shl N` は負値になる。ビット演算ではなくバイト単位のループで計算すること。
+
+---
+
+## netsh での `0.0.0.0/0`（全許可）指定
+
+`netsh advfirewall firewall` は `remoteip=0.0.0.0/0` を解釈できない。全許可を表す場合は `Any` を使う。
+
+```csharp
+// C# でのルール追加例
+var remoteIp = allowedSubnet == "0.0.0.0/0" ? "Any" : allowedSubnet;
+await ProcessX.StartAsync(
+    $"netsh advfirewall firewall add rule name=\"{ruleName}\" " +
+    $"protocol=TCP localport={port} dir=in action=allow profile=private remoteip={remoteIp}"
+).WaitAsync();
+```
+
+**`0.0.0.0/0` をそのまま渡すと `netsh` は ExitCode 1 でエラー終了する。** CIDR のバリデーションで通過した値でも、netsh に渡す前に変換が必要。

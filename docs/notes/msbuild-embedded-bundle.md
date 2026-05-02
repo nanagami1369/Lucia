@@ -1,6 +1,6 @@
 ---
 tags: msbuild,c#,installer
-updated: 2026-03-20 13:04:20
+updated: 2026-05-03 00:00:00
 ---
 
 # MSBuild EmbeddedResource による自動バンドル生成
@@ -58,6 +58,22 @@ using var stream = assembly.GetManifestResourceStream("app-bundle.zip")
 ZipArchive archive = new(stream);
 archive.ExtractToDirectory(targetPath, overwriteFiles: true);
 ```
+
+## `MSBuild` タスクより `Exec Command="dotnet publish"` が安定
+
+```xml
+<!-- MSBuild タスクを使う方法（プロパティの引き継ぎが複雑になりやすい） -->
+<MSBuild Projects="$(ServerProject)"
+         Targets="Restore;Publish"
+         Properties="Configuration=Release;RuntimeIdentifier=win-x64;..." />
+
+<!-- Exec + dotnet CLI の方が単純で確実 -->
+<Exec Command="dotnet publish &quot;$(ServerProject)&quot; --configuration Release --runtime win-x64 --no-self-contained --output &quot;$(AppPublishDir)&quot;" />
+```
+
+`MSBuild` タスクはプロパティの継承・スコープが複雑になる。`Exec Command="dotnet publish"` の方がコマンドライン引数として明示できるため挙動が予測しやすい。
+
+---
 
 ## 注意：ZipArchive.ExtractToDirectory のタイムスタンプ
 

@@ -1,6 +1,6 @@
 ---
 tags: aspnetcore,c#,windows-service,installer
-updated: 2026-03-20 13:04:20
+updated: 2026-05-03 00:00:00
 ---
 
 # ASP.NET Core を Windows Service として動作させる
@@ -66,31 +66,37 @@ if (!EventLog.SourceExists(sourceName)) {
 
 ## ConsoleAppFramework v5 でのインストーラー CLI 設計
 
+詳細は `consoleappframework-v5.md` を参照。サービス登録と組み合わせる場合の最小構成：
+
 ```csharp
-// Program.cs
+// Program.cs（引数なし = ステータス表示、不明コマンドは事前チェック）
+if (args.Length == 0) { ShowStatus(); return; }
+
+string[] known = ["install", "uninstall", "modify", "status", "--help", "-h", "--version"];
+if (!known.Contains(args[0])) {
+    Console.Error.WriteLine($"不明なコマンド: {args[0]}");
+    Environment.Exit(1); return;
+}
+
 var app = ConsoleApp.Create();
 app.Add<InstallerCommands>();
-app.Run(args);
+await app.RunAsync(args);
 
-// コマンドクラス
-public class InstallerCommands {
-    [Command("install")]
-    public void Install(
-        int port = 8080,
-        string installPath = @"C:\Program Files\MyApp",
-        string allowedSubnet = "192.168.0.0/16",
-        bool silent = false) { ... }
+// コマンドクラス（メソッド名が自動で kebab-case コマンド名になる）
+internal class InstallerCommands {
+    /// <summary>MyApp をインストールします。</summary>
+    /// <param name="port">ポート番号</param>
+    /// <param name="yes">確認プロンプトをスキップ</param>
+    public async Task Install(int port = 8080, bool yes = false) { ... }
 
-    [Command("uninstall")]
-    public void Uninstall(
-        string installPath = @"C:\Program Files\MyApp",
-        bool silent = false) { ... }
+    /// <summary>MyApp をアンインストールします。</summary>
+    /// <param name="yes">確認プロンプトをスキップ</param>
+    /// <param name="source">内部専用: TEMP コピー実行時のインストール先</param>
+    public async Task Uninstall(bool yes = false, [Hidden] string? source = null) { ... }
 }
 ```
 
-呼び出し：
-```bash
-MyApp.Installer.exe install --port 8080 --install-path "C:\Program Files\MyApp" --silent
-```
-
-**注意：** ConsoleAppFramework v5 は `--key=value` 形式を**サポートしない**。`--key value` を使う。
+**重要な注意点：**
+- `--key=value` 形式は**サポートしない**。`--key value` を使う
+- `app.Add<T>()` を使う場合、ラムダ式の doc コメントは機能しない（C# 仕様上の制限）。クラスのメソッドに書く
+- ConsoleAppFramework に不明コマンドを渡すと、root コマンドが呼ばれて exit 0 になる。exit 1 が必要なら上記のように事前チェックする
