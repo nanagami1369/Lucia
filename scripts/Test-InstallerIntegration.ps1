@@ -6,7 +6,7 @@
     以下のテストパターンを網羅する:
 
     No  シナリオ                              事前状態          操作
-    00  installer.exe ファイル確認            ビルド済み        ファイル存在確認
+    00  Lucia.Installer.exe ファイル確認            ビルド済み        ファイル存在確認
     01  新規インストール（デフォルト）         サービスなし      install --yes
     02  再インストール（稼働中に上書き）        サービス稼働中    install --yes
     03  カスタムポート（7100）                 サービスなし      install --port 7100 --yes
@@ -32,7 +32,7 @@
     23  不明なコマンドは終了コード 1           -                 unknown-command
 
 .PARAMETER InstallerPath
-    テスト対象の installer.exe のパス。省略時は Release publish の出力先を使用。
+    テスト対象の Lucia.Installer.exe のパス。省略時は Release publish の出力先を使用。
 
 .PARAMETER LogFile
     テスト結果を書き出すログファイルのパス。UAC 昇格後の結果を非昇格シェルから参照するために使用。
@@ -49,7 +49,7 @@
 #>
 
 param(
-    [string]$InstallerPath = (Join-Path $PSScriptRoot '..\src\Lucia.Installer\bin\Release\net10.0-windows\win-x64\publish\installer.exe'),
+    [string]$InstallerPath = (Join-Path $PSScriptRoot '..\src\Lucia.Installer\bin\Release\net10.0-windows\win-x64\publish\Lucia.Installer.exe'),
     [string]$LogFile       = 'C:\Users\Public\lucia-test.log',
     [switch]$Force
 )
@@ -115,7 +115,7 @@ function Invoke-Installer {
         else { $_ }
     }) -join ' '
 
-    Write-Info "実行: installer.exe $argString"
+    Write-Info "実行: Lucia.Installer.exe $argString"
 
     $stdoutFile = [System.IO.Path]::GetTempFileName()
     $stderrFile = [System.IO.Path]::GetTempFileName()
@@ -294,7 +294,7 @@ function Run-Test([string]$number, [string]$name, [scriptblock]$body) {
 Write-Section '前提確認'
 
 if (-not (Test-Path $InstallerPath)) {
-    Write-Log "installer.exe が見つかりません: $InstallerPath" 'Red'
+    Write-Log "Lucia.Installer.exe が見つかりません: $InstallerPath" 'Red'
     Write-Log "先に Release ビルドを実行してください:" 'Yellow'
     Write-Log "  dotnet publish src/Lucia.Installer/Lucia.Installer.csproj --configuration Release"
     exit 1
@@ -329,8 +329,8 @@ if ($null -ne $existingService) {
 #  テスト実行
 # ════════════════════════════════════════════════════════════
 
-Run-Test '00' 'installer.exe ファイル確認' {
-    Assert-True (Test-Path $InstallerPath) "installer.exe が存在する"
+Run-Test '00' 'Lucia.Installer.exe ファイル確認' {
+    Assert-True (Test-Path $InstallerPath) "Lucia.Installer.exe が存在する"
 }
 
 Run-Test '01' '新規インストール（デフォルト設定）' {

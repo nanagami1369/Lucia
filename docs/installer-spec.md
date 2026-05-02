@@ -78,10 +78,10 @@ OSネイティブに統合されたUX体験を提供する。
 ### 書式
 
 ```
-installer.exe --silent [インストールオプション]
-installer.exe --silent --uninstall
-installer.exe --silent --modify [--port <番号>] [--subnet <CIDR>]
-installer.exe --help
+Lucia.Installer.exe --silent [インストールオプション]
+Lucia.Installer.exe --silent --uninstall
+Lucia.Installer.exe --silent --modify [--port <番号>] [--subnet <CIDR>]
+Lucia.Installer.exe --help
 ```
 
 ### オプション
@@ -118,7 +118,7 @@ installer.exe --help
 |---|---|
 | 配置先 | `[インストール先]`（デフォルト: `C:\Program Files\Lucia\`） |
 | 配置ファイル | `Lucia.Server.exe` およびpublish出力の全ファイル |
-| `installer.exe` | インストーラー自身をインストール先に配置（アンインストーラー兼用） |
+| `Lucia.Installer.exe` | インストーラー自身をインストール先に配置（アンインストーラー兼用） |
 | ビット幅 | 64-bit |
 
 ---
@@ -130,7 +130,7 @@ installer.exe --help
 | 順序 | 処理 | 備考 |
 |---|---|---|
 | 1 | レジストリ書き込み | **最初に実行**。失敗時でも設定アプリから確認・リペア可能にするため |
-| 2 | ファイル展開・`installer.exe` 配置 | — |
+| 2 | ファイル展開・`Lucia.Installer.exe` 配置 | — |
 | 3 | Windows Service 登録（既存なら `sc config` でリペア） | 他サービスを破壊しないよう削除せず上書き更新 |
 | 4 | ファイアウォール規則（既存削除→再追加） | ポート・サブネット変更に対応 |
 | 5 | イベントログソース登録（なければ作成） | — |
@@ -190,8 +190,8 @@ installer.exe --help
 | `DisplayName` | REG_SZ | アプリ名 | `Lucia` |
 | `DisplayVersion` | REG_SZ | バージョン文字列 | `1.0.0.0` |
 | `Publisher` | REG_SZ | 発行元 | `nanagami1369` |
-| `UninstallString` | REG_SZ | アンインストール実行コマンド | `"[インストール先]installer.exe" --uninstall` |
-| `ModifyPath` | REG_SZ | 設定変更起動コマンド（設定アプリの「変更」ボタン） | `"[インストール先]installer.exe" --modify` |
+| `UninstallString` | REG_SZ | アンインストール実行コマンド | `"[インストール先]Lucia.Installer.exe" --uninstall` |
+| `ModifyPath` | REG_SZ | 設定変更起動コマンド（設定アプリの「変更」ボタン） | `"[インストール先]Lucia.Installer.exe" --modify` |
 | `InstallLocation` | REG_SZ | インストール先フォルダ | `[インストール先]` |
 | `Port` | REG_DWORD | サービスのポート番号 | `6100` |
 | `AllowedSubnet` | REG_SZ | FWルールのサブネット | `192.168.0.0/16` |
@@ -208,11 +208,11 @@ installer.exe --help
 
 ## アンインストール自己コピー方式
 
-`installer.exe` はインストール先に配置されアンインストーラーを兼ねるが、自身が実行中のためファイル・フォルダを直接削除できない。これを回避するため自己コピー方式を採用する。
+`Lucia.Installer.exe` はインストール先に配置されアンインストーラーを兼ねるが、自身が実行中のためファイル・フォルダを直接削除できない。これを回避するため自己コピー方式を採用する。
 
 ### 動作フロー
 
-1. `installer.exe --uninstall`（または `--silent --uninstall`）が起動される
+1. `Lucia.Installer.exe --uninstall`（または `--silent --uninstall`）が起動される
 2. 自身を `%TEMP%\lucia-uninstaller-<GUID>.exe` にコピーする
 3. TEMPコピーを `--uninstall --source "<インストール先>"` で起動して元プロセスを終了する
 4. TEMPコピーは `--source` の存在でTEMP実行と判断し、実際のアンインストール処理を実行する
@@ -238,7 +238,7 @@ GUIモードでは手順3でTEMPコピーがアンインストール進捗画面
 
 ## 設定変更処理
 
-設定アプリの「変更」ボタンまたは `installer.exe --modify` で実行する。ファイルは一切触らない。
+設定アプリの「変更」ボタンまたは `Lucia.Installer.exe --modify` で実行する。ファイルは一切触らない。
 
 ### 変更手順
 

@@ -9,7 +9,7 @@
 # $PSScriptRoot から 4 階層上がリポジトリルート
 $RepoRoot      = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..\..' ))
 $LogFile       = Join-Path $RepoRoot 'logs\lucia-deploy.log'
-$InstallerPath = Join-Path $RepoRoot 'src\Lucia.Installer\bin\Release\net10.0-windows\win-x64\publish\installer.exe'
+$InstallerPath = Join-Path $RepoRoot 'src\Lucia.Installer\bin\Release\net10.0-windows\win-x64\publish\Lucia.Installer.exe'
 New-Item -ItemType Directory -Force -Path (Split-Path $LogFile) | Out-Null
 
 # 管理者権限チェック: 非昇格の場合はログファイル経由で出力を受け取りながら自己を昇格再実行する
@@ -38,7 +38,7 @@ function Invoke-Installer([string[]]$Arguments) {
         else { $_ }
     }) -join ' '
 
-    Write-Log "  実行: installer.exe $argString" 'Gray'
+    Write-Log "  実行: Lucia.Installer.exe $argString" 'Gray'
 
     $stdoutFile = [System.IO.Path]::GetTempFileName()
     $stderrFile = [System.IO.Path]::GetTempFileName()
@@ -72,7 +72,7 @@ if ($LASTEXITCODE -ne 0) {
     Write-Log 'ビルドに失敗しました。' 'Red'
     exit 1
 }
-Write-Log "  installer.exe: $InstallerPath" 'Gray'
+Write-Log "  Lucia.Installer.exe: $InstallerPath" 'Gray'
 
 # ── Step 2: 既存インストールをアンインストール ────────────────────────────
 Write-Log ''

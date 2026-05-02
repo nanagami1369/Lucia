@@ -17,7 +17,7 @@ public class InstallService : IInstallService
     private const string EventLogSource = "LuciaServer";
     private const string EventLogName = "Application";
     private const string RegistryUninstallKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Lucia";
-    private const string InstallerFileName = "installer.exe";
+    private const string InstallerFileName = "Lucia.Installer.exe";
     private const string ServerExecutableFileName = "Lucia.Server.exe";
 
     /// <inheritdoc />
@@ -35,7 +35,7 @@ public class InstallService : IInstallService
             WriteUninstallRegistry(options.InstallDirectory, installerPath, version, options.Port, options.AllowedSubnet);
             completedSteps.Push(() => { DeleteUninstallRegistry(); return Task.CompletedTask; });
 
-            // Step 2: ファイル展開 + installer.exe 自身をインストール先に配置
+            // Step 2: ファイル展開 + Lucia.Installer.exe 自身をインストール先に配置
             // リペア時にサービスがファイルをロックしているため、展開前に停止する
             progress.Report("ファイルを展開しています...");
             await StopServiceIfRunningAsync();
@@ -97,13 +97,13 @@ public class InstallService : IInstallService
         }
 
         // Step 4: レジストリ削除
-        // ファイル削除より先に行うことで、installer.exe 自身のロックでファイル削除が失敗しても
+        // ファイル削除より先に行うことで、Lucia.Installer.exe 自身のロックでファイル削除が失敗しても
         // 設定アプリのインストール済み一覧から必ず消えるようにする。
         progress.Report("レジストリキーを削除しています...");
         DeleteUninstallRegistry();
 
         // Step 5: ファイル削除（失敗時は cmd.exe で遅延削除にフォールバック）
-        // 自己アンインストール時は親プロセスが installer.exe をロックしているため直接削除できない場合がある。
+        // 自己アンインストール時は親プロセスが Lucia.Installer.exe をロックしているため直接削除できない場合がある。
         // その場合は親プロセス終了後に cmd.exe が削除する。
         progress.Report("ファイルを削除しています...");
         var filesDeleted = await TryRemoveDirectoryAsync(installDirectory);
@@ -174,7 +174,7 @@ public class InstallService : IInstallService
         archive.ExtractToDirectory(installDirectory, overwriteFiles: true);
     }
 
-    /// <summary>実行中の installer.exe をインストール先にコピーする。アンインストーラーとして兼用するため。</summary>
+    /// <summary>実行中の Lucia.Installer.exe をインストール先にコピーする。アンインストーラーとして兼用するため。</summary>
     private static void CopyInstallerToInstallDirectory(string installDirectory)
     {
         var currentExePath = Environment.ProcessPath
@@ -415,7 +415,7 @@ public class InstallService : IInstallService
 
     /// <summary>
     /// cmd.exe を使い、一定時間後にディレクトリを削除するよう委譲する。
-    /// 自己アンインストール時に installer.exe が自身をロックして直接削除できない場合のフォールバック。
+    /// 自己アンインストール時に Lucia.Installer.exe が自身をロックして直接削除できない場合のフォールバック。
     /// 親プロセスが終了するまで待機してから削除する。
     /// </summary>
     private static void ScheduleDirectoryDeletion(string directory)

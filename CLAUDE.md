@@ -21,7 +21,7 @@ dotnet run --project src/Lucia.Server/Lucia.Server/Lucia.Server.csproj
 dotnet build --configuration Release
 
 # CLI インストーラーのビルド（Windows Service 用）
-# src/Lucia.Installer/bin/Release/net10.0-windows/installer.exe に出力される
+# src/Lucia.Installer/bin/Release/net10.0-windows/Lucia.Installer.exe に出力される
 # 内部で Lucia.Server の publish まで自動実行される
 dotnet publish src/Lucia.Installer/Lucia.Installer.csproj --configuration Release
 ```
@@ -75,8 +75,8 @@ Windows OS (Cassia で RDP セッション / ProcessX で電源コマンド)
 - `OutputType=Exe` の純粋なコンソールアプリ。
 - CLI 専用。将来 GUI が必要な場合は別プロジェクトとして CLI を呼び出す薄いシェルを作成する。
 - Lucia.Server の publish は `Lucia.Installer.csproj` の `BuildServerBundle` MSBuild Target に実装し、`BeforeTargets="CoreCompile"` で自動実行される（Release のみ）。
-- `installer.exe` は Lucia.Server の発行物を EmbeddedResource（`app-bundle.zip`）として内包する。
-- インストール先に `installer.exe` を配置しアンインストーラーとして兼用（自己コピー方式で自己削除問題を回避）。
+- `Lucia.Installer.exe` は Lucia.Server の発行物を EmbeddedResource（`app-bundle.zip`）として内包する。
+- インストール先に `Lucia.Installer.exe` を配置しアンインストーラーとして兼用（自己コピー方式で自己削除問題を回避）。
 - Debug ビルドではバンドルを埋め込まないため、インストール実処理は Release ビルドで確認する。
 
 ## docs/ へのドキュメント記録

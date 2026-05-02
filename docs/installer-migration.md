@@ -105,11 +105,11 @@
 ```
 C:\Program Files\Lucia\
 ├── Lucia.Server.exe
-├── installer.exe        ← インストール・アンインストール兼用
+├── Lucia.Installer.exe        ← インストール・アンインストール兼用
 └── ...
 ```
 
-`UninstallString` = `"C:\Program Files\Lucia\installer.exe" --uninstall`
+`UninstallString` = `"C:\Program Files\Lucia\Lucia.Installer.exe" --uninstall`
 
 ### 自己削除問題と解決策
 

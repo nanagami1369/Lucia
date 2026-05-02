@@ -19,7 +19,7 @@ string[] knownCommands = ["install", "uninstall", "modify", "status", "--help", 
 if (!knownCommands.Contains(args[0]))
 {
     Console.Error.WriteLine($"エラー: 不明なコマンド '{args[0]}'");
-    Console.Error.WriteLine("使い方を確認するには: installer.exe --help");
+    Console.Error.WriteLine("使い方を確認するには: Lucia.Installer.exe --help");
     Environment.Exit(1);
     return;
 }
@@ -43,6 +43,6 @@ static void ShowDefaultStatus()
     else
     {
         Console.WriteLine("Lucia はインストールされていません。");
-        Console.WriteLine("インストールするには: installer.exe install");
+        Console.WriteLine("インストールするには: Lucia.Installer.exe install");
     }
 }
