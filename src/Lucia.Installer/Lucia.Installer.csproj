@@ -44,7 +44,8 @@
     <RemoveDir Directories="$(AppPublishDir)" />
     <Delete Files="$(AppBundleZip)" Condition="Exists('$(AppBundleZip)')" />
     <MakeDir Directories="$(AppPublishDir)" />
-    <Exec Command="dotnet publish &quot;$(ServerProject)&quot; --configuration Release --runtime win-x64 --no-self-contained --output &quot;$(AppPublishDir)&quot;" />
+    <Exec Command="dotnet publish &quot;$(ServerProject)&quot; --configuration Release --runtime win-x64 --no-self-contained --output &quot;$(AppPublishDir)&quot;"
+          EnvironmentVariables="MSBUILDDISABLENODEREUSE=1" />
     <ZipDirectory SourceDirectory="$(AppPublishDir)" DestinationFile="$(AppBundleZip)" Overwrite="true" />
     <Message Text="[Lucia.Installer] バンドル生成完了: $(AppBundleZip)" Importance="high" />
   </Target>
