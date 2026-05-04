@@ -45,7 +45,7 @@ else
 var files = state["files"] as JsonArray ?? new JsonArray();
 if (!files.Any(f => (f as JsonValue)?.GetValue<string>() == relativePath))
 {
-    files.Add(relativePath);
+    files.Add(JsonValue.Create(relativePath));
     state["files"] = files;
 }
 

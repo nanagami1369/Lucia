@@ -11,7 +11,9 @@
       "Bash(pwsh -ExecutionPolicy Bypass -File scripts/Test-InstallerIntegration.ps1)",
       "Bash(dotnet new wpf *)",
       "Bash(dotnet add *)",
-      "Bash(dotnet publish *)"
+      "Bash(dotnet publish *)",
+      "Bash(dotnet run *)",
+      "Bash(echo \"EXIT:$?\")"
     ]
   }
 }
