@@ -1,5 +1,22 @@
 {
+  "permissions": {
+    "deny": [
+      "Bash(git commit*)",
+      "Bash(git add*)"
+    ]
+  },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "dotnet run hooks/git-guard/block-commit.cs"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
