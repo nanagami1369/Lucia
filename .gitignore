@@ -189,6 +189,9 @@ publish/
 src/Lucia.Installer/app-bundle.zip
 src/Lucia.Installer/app-publish/
 
+# hooks の実行時状態ファイル（セッション間の pending.json）
+hooks/state/
+
 # Publish Web Output
 *.[Pp]ublish.xml
 *.azurePubxml

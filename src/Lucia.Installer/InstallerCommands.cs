@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+
 using ConsoleAppFramework;
+
 using Lucia.Installer.Models;
 using Lucia.Installer.Services;
 
@@ -124,18 +126,22 @@ internal class InstallerCommands
         var outputTask = Task.Run(async () =>
         {
             string? line;
-            while ((line = await process.StandardOutput.ReadLineAsync()) != null)
+            while ((line = await process.StandardOutput.ReadLineAsync()) != null) {
                 Console.WriteLine(line);
+            }
         });
         var errorTask = Task.Run(async () =>
         {
             string? line;
-            while ((line = await process.StandardError.ReadLineAsync()) != null)
+            while ((line = await process.StandardError.ReadLineAsync()) != null) {
                 Console.Error.WriteLine(line);
+            }
         });
         await Task.WhenAll(outputTask, errorTask);
         await process.WaitForExitAsync();
-        if (process.ExitCode != 0) Environment.Exit(process.ExitCode);
+        if (process.ExitCode != 0) {
+            Environment.Exit(process.ExitCode);
+        }
     }
 
     /// <summary>設定を変更します（ポート・サブネット）。</summary>
@@ -211,7 +217,10 @@ internal class InstallerCommands
     /// <summary>--yes フラグがある場合は即座に true を返し、ない場合はユーザーに確認を求める。</summary>
     private static bool ConfirmAction(bool yes, string prompt)
     {
-        if (yes) return true;
+        if (yes) {
+            return true;
+        }
+
         Console.Write($"{prompt} [y/N]: ");
         var input = Console.ReadLine()?.Trim().ToLowerInvariant();
         return input == "y" || input == "yes";
@@ -220,12 +229,27 @@ internal class InstallerCommands
     /// <summary>IPv4 CIDR 表記として正しいかどうかを検証する。</summary>
     private static bool IsValidCidr(string value)
     {
-        if (string.IsNullOrWhiteSpace(value)) return false;
+        if (string.IsNullOrWhiteSpace(value)) {
+            return false;
+        }
+
         var parts = value.Split('/');
-        if (parts.Length != 2) return false;
-        if (!IPAddress.TryParse(parts[0], out var address)) return false;
-        if (address.AddressFamily != AddressFamily.InterNetwork) return false;
-        if (!int.TryParse(parts[1], out var prefix)) return false;
+        if (parts.Length != 2) {
+            return false;
+        }
+
+        if (!IPAddress.TryParse(parts[0], out var address)) {
+            return false;
+        }
+
+        if (address.AddressFamily != AddressFamily.InterNetwork) {
+            return false;
+        }
+
+        if (!int.TryParse(parts[1], out var prefix)) {
+            return false;
+        }
+
         return prefix >= 0 && prefix <= 32;
     }
 }

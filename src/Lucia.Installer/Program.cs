@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using System.Security.Principal;
 using System.Text;
+
 using ConsoleAppFramework;
+
 using Lucia.Installer;
 
 Console.OutputEncoding = Encoding.UTF8;

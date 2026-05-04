@@ -1,0 +1,39 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "dotnet run hooks/dotnet-format/record-edit.cs"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "dotnet run hooks/dotnet-format/auto-formatter.cs"
+          },
+          {
+            "type": "command",
+            "command": "dotnet run hooks/dotnet-format/braces-enforcer.cs"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "dotnet run hooks/dotnet-format/recovery.cs"
+          }
+        ]
+      }
+    ]
+  }
+}

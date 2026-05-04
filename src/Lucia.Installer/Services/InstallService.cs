@@ -3,8 +3,11 @@ using System.IO;
 using System.IO.Compression;
 using System.Reflection;
 using System.ServiceProcess;
+
 using Cysharp.Diagnostics;
+
 using Lucia.Installer.Models;
+
 using Microsoft.Win32;
 
 namespace Lucia.Installer.Services;
@@ -62,7 +65,7 @@ public class InstallService : IInstallService
             {
                 EventLog.CreateEventSource(EventLogSource, EventLogName);
             }
-            completedSteps.Push(() => { if (EventLog.SourceExists(EventLogSource)) EventLog.DeleteEventSource(EventLogSource); return Task.CompletedTask; });
+            completedSteps.Push(() => { if (EventLog.SourceExists(EventLogSource)) { EventLog.DeleteEventSource(EventLogSource); } return Task.CompletedTask; });
 
             progress.Report("完了しました。");
         }
@@ -346,13 +349,17 @@ public class InstallService : IInstallService
     {
         using var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
         using var uninstallKey = baseKey.OpenSubKey(RegistryUninstallKeyPath);
-        if (uninstallKey is null) return null;
+        if (uninstallKey is null) {
+            return null;
+        }
 
         var installDirectory = uninstallKey.GetValue("InstallLocation") as string;
         var port = uninstallKey.GetValue("Port") as int?;
         var allowedSubnet = uninstallKey.GetValue("AllowedSubnet") as string;
 
-        if (installDirectory is null || port is null || allowedSubnet is null) return null;
+        if (installDirectory is null || port is null || allowedSubnet is null) {
+            return null;
+        }
 
         return new InstallOptions
         {
@@ -378,7 +385,10 @@ public class InstallService : IInstallService
     {
         for (var attempt = 0; attempt < maxRetries; attempt++)
         {
-            if (!Directory.Exists(directory)) return;
+            if (!Directory.Exists(directory)) {
+                return;
+            }
+
             try
             {
                 Directory.Delete(directory, recursive: true);
@@ -399,7 +409,10 @@ public class InstallService : IInstallService
     {
         for (var attempt = 0; attempt < maxRetries; attempt++)
         {
-            if (!Directory.Exists(directory)) return true;
+            if (!Directory.Exists(directory)) {
+                return true;
+            }
+
             try
             {
                 Directory.Delete(directory, recursive: true);
