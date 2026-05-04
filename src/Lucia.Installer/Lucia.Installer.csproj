@@ -31,6 +31,20 @@
     <SelfContained>false</SelfContained>
   </PropertyGroup>
 
+  <!--
+    ソリューション全体ビルド時に Lucia.Server.Client.csproj のコンパイルが BuildServerBundle より
+    先に完了するよう、ビルド順序のみを制御する依存関係を定義する。
+    ReferenceOutputAssembly=false でアセンブリ参照は無効、SkipGetTargetFrameworkProperties=true で
+    TFM 不一致（net10.0-windows vs net10.0）によるエラーを回避する。
+  -->
+  <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <ProjectReference Include="$(ServerProject)">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+      <Private>false</Private>
+    </ProjectReference>
+  </ItemGroup>
+
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <EmbeddedResource Include="$(AppBundleZip)" LogicalName="app-bundle.zip" />
   </ItemGroup>
