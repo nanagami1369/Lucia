@@ -4,8 +4,8 @@
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
-        <!-- 管理者権限必須: UAC プロンプトを起動時に表示する -->
-        <requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
+        <!-- 通常権限で起動し、必要なコマンド実行時にプログラム側で昇格する -->
+        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
       </requestedPrivileges>
     </security>
   </trustInfo>
