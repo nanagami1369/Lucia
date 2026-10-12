@@ -1,4 +1,6 @@
-﻿namespace Lucia.Server.TimerServices;
+﻿using Lucia.Services.Timer;
+
+namespace Lucia.Server.TimerServices;
 
 /// <summary>
 /// タイマーコンテナのインターフェース
@@ -10,8 +12,9 @@ public interface ITimerContainer {
     /// <typeparam name="TKey">キーとなる型</typeparam>
     /// <param name="executeAt">実行予定時刻</param>
     /// <param name="action">実行するアクション</param>
+    /// <param name="reminders">本実行前に実行する事前処理。登録時点で残り時間が Before 未満のものは無視される</param>
     /// <returns>登録成功時は true、既に登録済みの場合は false</returns>
-    bool Register<TKey>(DateTimeOffset executeAt, Func<Task> action);
+    bool Register<TKey>(DateTimeOffset executeAt, Func<Task> action, params TimerReminder[] reminders);
 
     /// <summary>
     /// タイマーをキャンセルする
@@ -28,7 +31,7 @@ public interface ITimerContainer {
     TimeSpan? GetRemaining<TKey>();
 
     /// <summary>
-    /// 実行時刻を過ぎたエントリを1件取得し削除する
+    /// 実行時刻を過ぎたエントリまたは事前処理を1件取得する
     /// </summary>
     /// <returns>実行すべきアクション。なければ null</returns>
     Func<Task>? TryDequeue();

@@ -24,4 +24,11 @@ public interface ISessionService : IService {
     /// Terminal Service を再起動、成功時true
     /// </summary>
     Task RestartRdp();
+
+    /// <summary>
+    /// 操作中の全ユーザーセッションのデスクトップにメッセージを表示する
+    /// </summary>
+    /// <param name="caption">メッセージのタイトル</param>
+    /// <param name="message">メッセージ本文</param>
+    void NotifyActiveSessions(string caption, string message);
 }

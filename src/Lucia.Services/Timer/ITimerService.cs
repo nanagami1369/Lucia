@@ -11,8 +11,9 @@ public interface ITimerService<Tkey> {
     /// <typeparam name="TKey">キーとなる型</typeparam>
     /// <param name="executeAt">実行予定時刻</param>
     /// <param name="action">実行するアクション</param>
+    /// <param name="reminders">本実行前に実行する事前処理。登録時点で残り時間が Before 未満のものは無視される</param>
     /// <returns>登録成功時は true、既に登録済みの場合は false</returns>
-    bool Register(DateTimeOffset executeAt, Func<Task> action);
+    bool Register(DateTimeOffset executeAt, Func<Task> action, params TimerReminder[] reminders);
 
     /// <summary>
     /// タイマーをキャンセルする

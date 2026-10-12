@@ -1,3 +1,5 @@
+using Lucia.Services.Timer;
+
 namespace Lucia.Server.TimerServices;
 
 /// <summary>
@@ -13,20 +15,28 @@ public class TimerContainer : ITimerContainer {
     /// <typeparam name="TKey">キーとなる型</typeparam>
     /// <param name="executeAt">実行予定時刻</param>
     /// <param name="action">実行するアクション</param>
+    /// <param name="reminders">本実行前に実行する事前処理。登録時点で残り時間が Before 未満のものは無視される</param>
     /// <returns>登録成功時は true、既に登録済みの場合は false</returns>
-    public bool Register<TKey>(DateTimeOffset executeAt, Func<Task> action) {
+    public bool Register<TKey>(DateTimeOffset executeAt, Func<Task> action, params TimerReminder[] reminders) {
         lock (_lock) {
             var key = typeof(TKey);
             if (_entries.ContainsKey(key)) {
                 return false;
             }
-            _entries[key] = new TimerEntry(executeAt, action);
+
+            // 登録時点で既に事前処理の時刻を過ぎているものは、即時実行されてしまうため登録しない
+            var remaining = executeAt - DateTimeOffset.Now;
+            var pendingReminders = reminders
+                .Where(r => r.Before <= remaining)
+                .ToList();
+
+            _entries[key] = new TimerEntry(executeAt, action, pendingReminders);
             return true;
         }
     }
 
     /// <summary>
-    /// タイマーをキャンセルする
+    /// タイマーをキャンセルする（未実行の事前処理も含めて破棄される）
     /// </summary>
     /// <typeparam name="TKey">キーとなる型</typeparam>
     /// <returns>キャンセル成功時は true</returns>
@@ -52,7 +62,7 @@ public class TimerContainer : ITimerContainer {
     }
 
     /// <summary>
-    /// 実行時刻を過ぎたエントリを1件取得し削除する
+    /// 実行時刻を過ぎたエントリまたは事前処理を1件取得する
     /// </summary>
     /// <returns>実行すべきアクション。なければ null</returns>
     public Func<Task>? TryDequeue() {
@@ -61,13 +71,23 @@ public class TimerContainer : ITimerContainer {
 
             // 1回のポーリングで1件のみ処理する
             // 複数同時実行による負荷集中を避けるため、次回ポーリングに委ねる
-            var dequeue = _entries.FirstOrDefault(kv => kv.Value.ExecuteAt <= now);
 
-            if (dequeue.Key == null) {
-                return null;
+            // 本実行を優先する。本実行時刻を過ぎていれば未実行の事前処理は意味がないため破棄する
+            var dueEntry = _entries.FirstOrDefault(kv => kv.Value.ExecuteAt <= now);
+            if (dueEntry.Key != null) {
+                _entries.Remove(dueEntry.Key);
+                return dueEntry.Value.Action;
             }
-            _entries.Remove(dequeue.Key);
-            return dequeue.Value.Action;
+
+            foreach (var entry in _entries.Values) {
+                var dueReminder = entry.PendingReminders.FirstOrDefault(r => entry.ExecuteAt - r.Before <= now);
+                if (dueReminder != null) {
+                    entry.PendingReminders.Remove(dueReminder);
+                    return dueReminder.Action;
+                }
+            }
+
+            return null;
         }
     }
 }

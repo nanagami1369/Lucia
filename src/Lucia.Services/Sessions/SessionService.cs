@@ -146,4 +146,54 @@ public class SessionService : ISessionService {
         }
     }
 
+    /// <summary>
+    /// 操作中の全ユーザーセッションのデスクトップにメッセージを表示する
+    /// </summary>
+    /// <param name="caption">メッセージのタイトル</param>
+    /// <param name="message">メッセージ本文</param>
+    public void NotifyActiveSessions(string caption, string message) {
+
+        bool success = false;
+        try {
+
+            logger.LogInformation($"セッション通知開始 caption={caption}");
+            using var server = manager.GetLocalServer();
+            // 切断中のセッションは誰も画面を見ていないため対象外
+            var activeSessions = server
+                .GetSessions()
+                .Where(s => s.UserAccount != null)
+                .Where(s => s.ConnectionState is ConnectionState.Active or ConnectionState.Connected);
+
+            foreach (var session in activeSessions) {
+                // 1セッションの失敗で残りのセッションへの通知を止めない
+                try {
+                    // 見落とし防止のため最前面に表示し、ユーザーの応答は待たない
+                    session.MessageBox(
+                        message,
+                        caption,
+                        RemoteMessageBoxButtons.Ok,
+                        RemoteMessageBoxIcon.Warning,
+                        RemoteMessageBoxDefaultButton.Button1,
+                        RemoteMessageBoxOptions.TopMost | RemoteMessageBoxOptions.SetForeground,
+                        TimeSpan.Zero,
+                        false);
+                    logger.LogInformation($"セッション通知成功 sessionId={session.SessionId}");
+                } catch (Exception ex) {
+                    logger.LogError(ex, $"セッション通知でエラーが発生しました。sessionId={session.SessionId}");
+                }
+            }
+            success = true;
+
+        } catch (Exception ex) {
+
+            logger.LogError(ex, "セッション通知処理でエラーが発生しました。");
+            throw;
+
+        } finally {
+
+            statsLogger.LogAction(success);
+
+        }
+    }
+
 }
